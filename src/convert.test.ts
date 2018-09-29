@@ -1,4 +1,3 @@
-import test from 'ava'
 import { printSchema } from 'graphql'
 import convert from './convert'
 
@@ -16,17 +15,17 @@ const PERSON = {
   },
 }
 
-test('simple object', t => {
-  t.plan(1)
+test('simple object', () => {
+  expect.assertions(1)
 
   const schema = printSchema(convert(PERSON))
-  // tslint:disable-next-line:no-console
-  // console.log(schema)
-  return t.is(
-    schema,
-    `type Query {
-  _empty: String
-}
-`
-  )
+  return expect(schema).toEqualIgnoringWhitespace(`
+    type person {
+      name: String
+      age: Int
+    }
+
+    type Query {
+      findPerson: person
+    }`)
 })

@@ -2,7 +2,7 @@ import Ajv from 'ajv'
 import { GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { convert, newContext } from './converter'
 
-const obj = (m: Map<any, any>): any =>
+const objectify = (m: Map<any, any>): any =>
   // tslint:disable-next-line
   [...m.entries()].reduce((o, [k, v]) => ((o[k] = v), o), {})
 
@@ -14,7 +14,7 @@ export default function _convert(jsonSchema: any): GraphQLSchema {
   const context = newContext()
   convert(context, jsonSchema)
 
-  const types = obj(context.types)
+  const types = objectify(context.types)
   const schema = {
     ...types,
     query: new GraphQLObjectType({
