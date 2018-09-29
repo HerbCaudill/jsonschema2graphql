@@ -18,7 +18,6 @@
     "fix:tslint": "tslint --fix --project .",
     "test": "run-s build test:*",
     "test:lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "nyc --silent ava",
     "watch": "run-s clean build:main && run-p \"build:main -- -w\" \"test:unit -- --watch\"",
     "cov": "run-s build test:unit cov:html && opn coverage/index.html",
     "cov:html": "nyc report --reporter=html",
@@ -28,6 +27,7 @@
     "doc:html": "typedoc src/ --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
+    "test:unit": "jest",
     "version": "standard-version",
     "reset": "git clean -dfx && git reset --hard && npm i",
     "clean": "trash build test",
@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "tmp-promise": "^1.0.5",
-    "ava": "1.0.0-beta.7",
+    "@types/escodegen": "^0.0.6",
     "codecov": "^3.1.0",
     "cz-conventional-changelog": "^2.1.0",
     "gh-pages": "^2.0.0",
@@ -82,15 +82,26 @@
     "typedoc": "^0.12.0",
     "typescript": "^3.0.3"
   },
-  "ava": {
-    "failFast": true,
-    "files": [
-      "build/main/**/*.spec.js",
-      "build/main/**/*.test.js"
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
     ],
-    "sources": [
-      "build/main/**/*.js"
-    ]
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/?(*.)test.ts?(x)"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+     "setupTestFrameworkScriptFile": "<rootDir>/src/testUtils/matchers/index.ts"
   },
   "config": {
     "commitizen": {
