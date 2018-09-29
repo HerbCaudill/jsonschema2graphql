@@ -9,15 +9,15 @@
     "inlineSourceMap": true,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
 
-    "strict": true /* Enable all strict type-checking options. */,
+    // "strict": true /* Enable all strict type-checking options. */,
 
     /* Strict Type-Checking Options */
-    // "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
-    // "strictNullChecks": true /* Enable strict null checks. */,
-    // "strictFunctionTypes": true /* Enable strict checking of function types. */,
-    // "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
-    // "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
-    // "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
+    "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "strictNullChecks": true /* Enable strict null checks. */,
+    "strictFunctionTypes": true /* Enable strict checking of function types. */,
+    "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
+    "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
+    "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
 
     /* Additional Checks */
     "noUnusedLocals": true /* Report errors on unused locals. */,
@@ -35,11 +35,11 @@
     // "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
     // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
 
-    "lib": ["es2017"],
+    "lib": ["es2017", "esnext.asynciterable"],
     "types": ["node"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/converter.ts", "src/converter.test.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }

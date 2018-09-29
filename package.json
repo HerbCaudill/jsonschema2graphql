@@ -52,9 +52,20 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "sha.js": "^2.4.11"
+    "@types/camelcase": "^4.1.0",
+    "@types/escodegen": "^0.0.6",
+    "@types/graphql": "^14.0.1",
+    "@types/uppercamelcase": "^3.0.0",
+    "ajv": "^6.5.4",
+    "camelcase": "^5.0.0",
+    "escodegen": "^1.11.0",
+    "fs-extra": "^7.0.0",
+    "graphql": "^14.0.2",
+    "lodash": "^4.17.11",
+    "uppercamelcase": "^3.0.0"
   },
   "devDependencies": {
+    "tmp-promise": "^1.0.5",
     "ava": "1.0.0-beta.7",
     "codecov": "^3.1.0",
     "cz-conventional-changelog": "^2.1.0",
@@ -74,7 +85,8 @@
   "ava": {
     "failFast": true,
     "files": [
-      "build/main/**/*.spec.js"
+      "build/main/**/*.spec.js",
+      "build/main/**/*.test.js"
     ],
     "sources": [
       "build/main/**/*.js"
@@ -86,7 +98,10 @@
     }
   },
   "prettier": {
-    "singleQuote": true
+    "printWidth": 75,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
   "nyc": {
     "exclude": [

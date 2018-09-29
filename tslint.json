@@ -1,5 +1,9 @@
 {
-  "extends": ["tslint:latest", "tslint-config-prettier", "tslint-immutable"],
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier",
+    "tslint-immutable"
+  ],
   "rules": {
     "interface-name": [true, "never-prefix"],
     // TODO: allow devDependencies only in **/*.spec.ts files:
@@ -14,21 +18,24 @@
 
     // Immutability rules
     "readonly-keyword": true,
-    "readonly-array": true,
+    // "readonly-array": true,
     "no-let": true,
     "no-object-mutation": true,
     "no-delete": true,
     "no-method-signature": true,
 
     // Functional style rules
-    "no-this": true,
-    "no-class": true,
-    "no-mixed-interface": true,
-    "no-expression-statement": [
-      true,
-      { "ignore-prefix": ["console.", "process.exit"] }
-    ],
-    "no-if-statement": true
+    // "no-this": true,
+    // "no-class": true,
+    // "no-mixed-interface": true
+    // "no-expression-statement": [
+    //   true,
+    //   { "ignore-prefix": ["console.", "process.exit"] }
+    // ],
+    // "no-if-statement": true
     /* end tslint-immutable rules */
+
+    "no-shadowed-variable": false,
+    "object-literal-sort-keys": false
   }
 }
