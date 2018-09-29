@@ -18,7 +18,7 @@ const PERSON = {
 test('simple object', () => {
   expect.assertions(1)
 
-  const schema = printSchema(convert(PERSON))
+  const schema = printSchema(convert({ jsonSchema: PERSON }))
   return expect(schema).toEqualIgnoringWhitespace(`
     type person {
       name: String
@@ -26,6 +26,6 @@ test('simple object', () => {
     }
 
     type Query {
-      findPerson: person
+      people: [person]
     }`)
 })

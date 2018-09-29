@@ -226,7 +226,7 @@ function buildUnionType(
   return { output, input: undefined }
 }
 
-export function convert(context: Context, schema: any): InputOutput {
+export function converter(context: Context, schema: any): InputOutput {
   const typeName = schema.$id
 
   const typeBuilder = schema.switch ? buildUnionType : buildObjectType

@@ -1,28 +1,44 @@
 import Ajv from 'ajv'
-import { GraphQLObjectType, GraphQLSchema } from 'graphql'
-import { convert, newContext } from './converter'
+import { GraphQLObjectType, GraphQLSchema, GraphQLList } from 'graphql'
+import { converter, newContext } from './converter'
+import pluralize from 'pluralize'
 
 const objectify = (m: Map<any, any>): any =>
-  // tslint:disable-next-line
   [...m.entries()].reduce((o, [k, v]) => ((o[k] = v), o), {})
 
-export default function _convert(jsonSchema: any): GraphQLSchema {
-  const ajv = new Ajv({ schemaId: '$id' })
+interface ConvertOptions {
+  jsonSchema: any
+  query?: GraphQLObjectType
+}
+
+const buildQueryObject = (types: any): GraphQLObjectType => {
+  const fieldReducer = (prevResult: any, key: string) => ({
+    [pluralize(key)]: { type: new GraphQLList(types[key]) },
+    ...prevResult,
+  })
+  return new GraphQLObjectType({
+    name: 'Query',
+    fields: Object.keys(types).reduce(fieldReducer, {}),
+  })
+}
+export default function convert({
+  jsonSchema,
+  query,
+}: ConvertOptions): GraphQLSchema {
+  const ajv = new Ajv()
   ajv.addSchema(jsonSchema)
+
   // TODO: throw any validation errors
 
   const context = newContext()
-  convert(context, jsonSchema)
-
+  converter(context, jsonSchema)
   const types = objectify(context.types)
+
+  const queryObject = query ? query : buildQueryObject(types)
+
   const schema = {
     ...types,
-    query: new GraphQLObjectType({
-      name: 'Query',
-      fields: {
-        findPerson: { type: types.person },
-      },
-    }),
+    query: queryObject,
   }
 
   return new GraphQLSchema(schema)

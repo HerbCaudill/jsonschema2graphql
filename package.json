@@ -54,6 +54,7 @@
   "dependencies": {
     "@types/jest-diff": "^20.0.0",
     "@types/jest-matcher-utils": "^21.0.1",
+    "@types/pluralize": "^0.0.29",
     "ajv": "^6.5.4",
     "babel-jest": "^23.6.0",
     "camelcase": "^5.0.0",
@@ -63,6 +64,7 @@
     "jest-diff": "^23.6.0",
     "jest-matcher-utils": "^23.6.0",
     "lodash": "^4.17.11",
+    "pluralize": "^7.0.0",
     "uppercamelcase": "^3.0.0"
   },
   "devDependencies": {
@@ -108,7 +110,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-     "setupTestFrameworkScriptFile": "<rootDir>/src/testUtils/matchers/index.ts"
+    "setupTestFrameworkScriptFile": "<rootDir>/src/testUtils/matchers/index.ts"
   },
   "config": {
     "commitizen": {
