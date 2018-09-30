@@ -82,7 +82,7 @@ export default function convert({
 
   const ajv = new Ajv()
   schemaArray.forEach(schema => {
-    // ajv.addSchema(schema) // validate the json-schema
+    ajv.validateSchema(schema) // validate against the json schema schema
     processSchema(schema) // pull out its types
   })
 
