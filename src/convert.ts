@@ -148,7 +148,7 @@ export default function convert({
       return existingType ? existingType : buildEnum()
     }
 
-    const typeRef = prop.$ref || prop.$id
+    const typeRef = prop.$ref
     if (typeRef) {
       const typeMap = isInputType ? inputs : types
       const type = typeMap.get(typeRef)
