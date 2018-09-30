@@ -1,5 +1,5 @@
 import { printSchema } from 'graphql'
-import convert from './convert'
+import convert from '../src/convert'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
 
 // Helpers
