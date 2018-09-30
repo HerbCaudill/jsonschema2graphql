@@ -1,38 +1,94 @@
 """
-If this field element and the `approved` value is `true`, the log entry was reviewed and approved by a parent.
+Approval: If this field element and the `approved` value is `true`, the log entry was reviewed and approved by a parent.
 """
 type Approval {
+  "User ID: Reference to the User making the approval"
   user_id: String!
+
+  "Timestamp: Date and time that the approval was made"
   timeStamp: String!
+
+  "Approved: If an existing approval entry has a value of `approved=false`, then the log item was rejected."
   approved: Boolean!
 }
 
+"""
+Family: Represents a single family account and all its data.
+"""
 type Family {
   _id: String!
+
+  "Name: Name of the family. Typically one or two last names."
   name: String!
+
+  "Users: All users (parents and children) associated with the family."
   users: [User!]!
+
+  "Items: The tasks and rewards defined by this family."
   items: [Item!]!
 }
 
+"""
+Item: Represents a task (something that earns coins, e.g. walking the dog) or a
+reward (something that spends coins, e.g. screen time).
+"""
 type Item {
   _id: String!
+
+  "Name: Name of the task (for earning coins) or reward (for spending coins)."
   name: String!
+
+  "Icon"
   icon: String!
+
+  "Description: Description of the task or reward."
   description: String!
+
+  """
+  Timed?: If true, the number of coins generated or consumed by this item
+  depends of the number of minutes that it lasted. For example, screen time or reading time.
+  """
   isTimed: Boolean
+
+  "Coin value: Value in coins of the given task or activity. If the activity is timed, this is the value of 10 minutes."
   coinValue: Int!
+
+  "Range of coin values: Minimum and maximum coin values that can be earned or spent for this item."
   coinValueRange: ValueRange
 }
 
+"""
+Log: Records an activity that takes place on a specific date, along with the coins earned or spent.
+"""
 type Log {
   _id: String!
+
+  "Item ID: Reference to the Item being earned or spent in this log entry"
   item_id: String!
+
+  "Coins: Actual number of coins earned or spent. Might be determined automatically or entered manually."
   coins: Float!
+
+  "Date: The date on which the activity took place."
   date: String!
+
+  "Time: (Non-timed items only.) The time at which the activity took place."
   time: String
+
+  "Time range: (Timed items only.) The times at which the activity started and ended."
   timeRange: TimeRange
+
+  "Minutes: (Timed items only.) The number of minutes between the start and end time."
   minutes: Int
+
+  """
+  Manual entry?: If true, the time(s) for this log were entered or edited
+  manually (as opposed to being the moment that the item was logged, or the
+  moments that Start and Stop were pressed.
+  """
   isManualEntry: Boolean
+
+  "Approval: A record of the activity having been reviewed by a parent and either approved or rejected."
   approval: Approval
 }
 
@@ -48,20 +104,40 @@ type Query {
   families: [Family]
 }
 
+"""
+Time range: Start and end times for an activity.
+"""
 type TimeRange {
+  "Start time"
   start: String
+
+  "End time"
   end: String
 }
 
+"""
+User: Represents a single user (parent or child) and, in the case of a child, their full history.
+"""
 type User {
   _id: String!
   email: String!
+
+  "Name: This is the name that will be displayed to the user themselves."
   name: String!
+
+  "Nickname: This is the name that will be displayed to children using the app."
   nickname: String
+
+  "Parent?: If true, this user has elevated privileges in this family."
   isParent: Boolean
-  log: [Log!]
+
+  "Users: (Child only.) All of the historical activity (tasks performed, rewards earned) associated with this child."
+  logs: [Log!]
 }
 
+"""
+Value Range
+"""
 type ValueRange {
   min: Float
   max: Float

@@ -4,6 +4,7 @@ import diff from 'jest-diff'
 const compressWhitespace = (a: string[]) =>
   a.map(s =>
     s
+      .replace(/\s*""?"?\s*/g, `\r\n"""\r\n`) // standardize graphql description tokens
       .replace(/^\s*$(?:\r\n?|\n)/gm, ``) // remove empty lines
       .replace(/[ \t]+/g, ` `) // collapse double spaces
       .replace(/(\s*(?:\r\n?|\n)\s*)+/g, `\r\n`) // remove space before/after linefeeds

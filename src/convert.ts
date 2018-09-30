@@ -104,14 +104,13 @@ export default function convert({
       : JSON.parse(x) // string -> object
   }
 
-  function getDescription(d: any): string {
-    return ''
+  function getDescription(d: any): string | undefined {
+    if (d.title && d.description) return `${d.title}: ${d.description}`
+    return d.title || d.description || undefined
   }
 
   function processSchema(schema: JSONSchema7): GraphQLType {
     const typeName = schema.$id
-    const description = getDescription(schema)
-
     if (typeof typeName === 'undefined') throw err('Schema does not have an `$id` property.')
 
     const type = mapType(typeName, schema)
@@ -121,7 +120,7 @@ export default function convert({
 
   function mapType(propName: string, prop: any): GraphQLType {
     const name = uppercamelcase(propName)
-    const description: string | undefined = prop.description
+    const description = getDescription(prop)
 
     if (prop.oneOf) {
       return buildUnionType(propName, description, prop)
@@ -171,6 +170,7 @@ export default function convert({
           const isRequired = _.includes(schema.required, propKey)
           return {
             type: isRequired ? new GraphQLNonNull(type) : type,
+            description: getDescription(prop),
           }
         })
       : // GraphQL doesn't allow types with no fields, so put a placeholder
@@ -182,11 +182,8 @@ export default function convert({
     description: string | undefined,
     schema: any
   ): GraphQLObjectType {
-    return new GraphQLObjectType({
-      name,
-      description,
-      fields: () => buildFields(name, schema),
-    })
+    const fields = () => buildFields(name, schema)
+    return new GraphQLObjectType({ name, description, fields })
   }
 
   function buildUnionType(

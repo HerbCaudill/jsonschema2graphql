@@ -2,6 +2,7 @@ export const family = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'Family',
   title: 'Family',
+  description: 'Represents a single family account and all its data.',
   type: 'object',
   required: ['_id', 'name', 'users', 'items'],
   properties: {
@@ -17,6 +18,7 @@ export const family = {
     users: {
       type: 'array',
       title: 'Users',
+      description: 'All users (parents and children) associated with the family.',
       items: {
         $ref: 'User',
       },
@@ -25,6 +27,7 @@ export const family = {
     items: {
       type: 'array',
       title: 'Items',
+      description: 'The tasks and rewards defined by this family.',
       items: {
         $ref: 'Item',
       },

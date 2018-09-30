@@ -2,6 +2,8 @@ export const user = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'User',
   title: 'User',
+  description:
+    'Represents a single user (parent or child) and, in the case of a child, their full history.',
   type: 'object',
   required: ['_id', 'email', 'name'],
   properties: {
@@ -33,9 +35,11 @@ export const user = {
       description: 'If true, this user has elevated privileges in this family.',
     },
 
-    log: {
+    logs: {
       type: 'array',
       title: 'Users',
+      description:
+        '(Child only.) All of the historical activity (tasks performed, rewards earned) associated with this child.',
       items: {
         $ref: 'Log',
       },

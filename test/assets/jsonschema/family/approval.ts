@@ -11,8 +11,8 @@ export const approval = {
   required: ['user_id', 'timeStamp', 'approved'],
   properties: {
     user_id: {
-      // title: 'User ID',
-      // description: 'Reference to the User making the approval',
+      title: 'User ID',
+      description: 'Reference to the User making the approval',
       $ref: 'ObjectId',
     },
     timeStamp: {
@@ -25,6 +25,8 @@ export const approval = {
     approved: {
       type: 'boolean',
       title: 'Approved',
+      description:
+        'If an existing approval entry has a value of `approved=false`, then the log item was rejected.',
     },
   },
 }

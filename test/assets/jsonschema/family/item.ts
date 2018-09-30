@@ -5,6 +5,8 @@ export const item = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'Item',
   title: 'Item',
+  description:
+    'Represents a task (something that earns coins, e.g. walking the dog) or a reward (something that spends coins, e.g. screen time).',
   type: 'object',
   required: ['_id', 'name', 'icon', 'description', 'coinValue'],
   properties: {
@@ -15,7 +17,7 @@ export const item = {
     name: {
       type: 'string',
       title: 'Name',
-      description: 'Name of the task (for earning coins) or activity (for spending coins).',
+      description: 'Name of the task (for earning coins) or reward (for spending coins).',
       examples: ['Walk dog'],
     },
 
@@ -28,6 +30,7 @@ export const item = {
     description: {
       type: 'string',
       title: 'Description',
+      description: 'Description of the task or reward.',
       examples: [
         'Walk Bruno around the block, giving him enough time to pee at least twice and to poop.',
       ],
@@ -49,9 +52,8 @@ export const item = {
 
     coinValueRange: {
       $ref: 'ValueRange',
-      // title: 'Range of coin values',
-      // description:
-      //   'Minimum and maximum coin values that can be earned or spent for this item.',
+      title: 'Range of coin values',
+      description: 'Minimum and maximum coin values that can be earned or spent for this item.',
     },
   },
 }
