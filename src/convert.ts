@@ -114,8 +114,7 @@ export default function convert({
 
     if (typeof typeName === 'undefined') throw err('Schema does not have an `$id` property.')
 
-    const typeBuilder = schema.oneOf ? buildUnionType : buildObjectType
-    const type = typeBuilder(typeName, description, schema)
+    const type = mapType(typeName, schema)
     types.set(typeName, type)
     return type
   }
@@ -125,7 +124,11 @@ export default function convert({
     const description: string | undefined = prop.description
 
     if (prop.oneOf) {
-      const type = buildUnionType(propName, description, prop)
+      return buildUnionType(propName, description, prop)
+    }
+
+    if (prop.type === 'object') {
+      return buildObjectType(propName, description, prop)
     }
 
     if (prop.type === 'array') {
