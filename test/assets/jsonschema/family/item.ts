@@ -8,13 +8,14 @@ export const item = {
   type: 'object',
   required: ['_id', 'name', 'icon', 'description', 'coinValue'],
   properties: {
-    _id: objectId,
+    _id: {
+      $ref: 'ObjectId',
+    },
 
     name: {
       type: 'string',
       title: 'Name',
-      description:
-        'Name of the task (for earning coins) or activity (for spending coins).',
+      description: 'Name of the task (for earning coins) or activity (for spending coins).',
       examples: ['Walk dog'],
     },
 
@@ -47,10 +48,10 @@ export const item = {
     },
 
     coinValueRange: {
-      ...valueRange,
-      title: 'Range of coin values',
-      description:
-        'Minimum and maximum coin values that can be earned or spent for this item.',
+      $ref: 'ValueRange',
+      // title: 'Range of coin values',
+      // description:
+      //   'Minimum and maximum coin values that can be earned or spent for this item.',
     },
   },
 }

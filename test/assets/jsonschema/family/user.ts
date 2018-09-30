@@ -1,7 +1,3 @@
-import { log } from './log'
-import { objectId } from './objectId'
-import { email } from './email'
-
 export const user = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'User',
@@ -9,37 +5,40 @@ export const user = {
   type: 'object',
   required: ['_id', 'email', 'name'],
   properties: {
-    _id: objectId,
+    _id: {
+      $ref: 'ObjectId',
+    },
 
-    email: email,
+    email: {
+      $ref: 'Email',
+    },
 
     name: {
       type: 'string',
       title: 'Name',
-      description:
-        'This is the name that will be displayed to the user themselves.',
+      description: 'This is the name that will be displayed to the user themselves.',
       examples: ['Herb'],
     },
 
     nickname: {
       type: 'string',
       title: 'Nickname',
-      description:
-        'This is the name that will be displayed to children using the app.',
+      description: 'This is the name that will be displayed to children using the app.',
       examples: ['Daddy-O'],
     },
 
     isParent: {
       type: 'boolean',
       title: 'Parent?',
-      description:
-        'If true, this user has elevated privileges in this family.',
+      description: 'If true, this user has elevated privileges in this family.',
     },
 
     log: {
       type: 'array',
       title: 'Users',
-      items: log,
+      items: {
+        $ref: 'Log',
+      },
     },
   },
 }

@@ -11,9 +11,9 @@ export const approval = {
   required: ['user_id', 'timeStamp', 'approved'],
   properties: {
     user_id: {
-      title: 'User ID',
-      description: 'Reference to the User making the approval',
-      ...objectId,
+      // title: 'User ID',
+      // description: 'Reference to the User making the approval',
+      $ref: 'ObjectId',
     },
     timeStamp: {
       type: 'string',

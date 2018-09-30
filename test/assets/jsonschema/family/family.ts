@@ -1,7 +1,3 @@
-import { user } from './user'
-import { item } from './item'
-import { objectId } from './objectId'
-
 export const family = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'Family',
@@ -9,7 +5,7 @@ export const family = {
   type: 'object',
   required: ['_id', 'name', 'users', 'items'],
   properties: {
-    _id: objectId,
+    _id: { $ref: 'ObjectId' },
 
     name: {
       type: 'string',
@@ -21,13 +17,17 @@ export const family = {
     users: {
       type: 'array',
       title: 'Users',
-      items: user,
+      items: {
+        $ref: 'User',
+      },
     },
 
     items: {
       type: 'array',
       title: 'Items',
-      items: item,
+      items: {
+        $ref: 'Item',
+      },
     },
   },
 }

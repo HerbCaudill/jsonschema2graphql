@@ -1,7 +1,4 @@
 import { pattern } from './pattern'
-import { approval } from './approval'
-import { objectId } from './objectId'
-import { timeRange } from './timeRange'
 
 export const log = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -10,13 +7,14 @@ export const log = {
   title: 'Log',
   required: ['_id', 'item_id', 'coins', 'date'],
   properties: {
-    _id: objectId,
+    _id: {
+      $ref: 'ObjectId',
+    },
 
     item_id: {
-      title: 'Item ID',
-      description:
-        'Reference to the Item being earned or spent in this log entry',
-      ...objectId,
+      // title: 'Item ID',
+      // description: 'Reference to the Item being earned or spent in this log entry',
+      $ref: 'ObjectId',
     },
 
     coins: {
@@ -38,7 +36,9 @@ export const log = {
       pattern: pattern.TIME,
     },
 
-    timeRange,
+    timeRange: {
+      $ref: 'TimeRange',
+    },
 
     minutes: {
       type: 'integer',
@@ -52,6 +52,8 @@ export const log = {
         'If true, the time(s) for this log were entered or edited manually (as opposed to being the moment that the item was logged, or the moments that Start and Stop were pressed.',
     },
 
-    approval,
+    approval: {
+      $ref: 'Approval',
+    },
   },
 }
