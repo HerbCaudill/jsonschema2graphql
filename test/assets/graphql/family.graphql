@@ -1,19 +1,21 @@
+"""
+If this field element and the `approved` value is `true`, the log entry was reviewed and approved by a parent.
+"""
 type Approval {
-  user_id: ObjectId!
+  user_id: String!
   timeStamp: String!
   approved: Boolean!
 }
-type Email {
-  _empty: String
-}
+
 type Family {
-  _id: ObjectId!
+  _id: String!
   name: String!
   users: [User!]!
   items: [Item!]!
 }
+
 type Item {
-  _id: ObjectId!
+  _id: String!
   name: String!
   icon: String!
   description: String!
@@ -21,9 +23,10 @@ type Item {
   coinValue: Int!
   coinValueRange: ValueRange
 }
+
 type Log {
-  _id: ObjectId!
-  item_id: ObjectId!
+  _id: String!
+  item_id: String!
   coins: Float!
   date: String!
   time: String
@@ -32,32 +35,33 @@ type Log {
   isManualEntry: Boolean
   approval: Approval
 }
-type ObjectId {
-  _empty: String
-}
+
 type Query {
-  families: [Family]
-  users: [User]
-  logs: [Log]
+  objectIds: [String]
+  emails: [String]
+  valueRanges: [ValueRange]
+  timeRanges: [TimeRange]
   items: [Item]
   approvals: [Approval]
-  timeRanges: [TimeRange]
-  valueRanges: [ValueRange]
-  emails: [Email]
-  objectIds: [ObjectId]
+  logs: [Log]
+  users: [User]
+  families: [Family]
 }
+
 type TimeRange {
   start: String
   end: String
 }
+
 type User {
-  _id: ObjectId!
-  email: Email!
+  _id: String!
+  email: String!
   name: String!
   nickname: String
   isParent: Boolean
   log: [Log!]
 }
+
 type ValueRange {
   min: Float
   max: Float

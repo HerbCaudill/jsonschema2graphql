@@ -511,7 +511,17 @@ test('converts `oneOf` schemas to union types', () => {
 //
 // Family tests
 
-const FAMILY = [family, user, log, item, approval, timeRange, valueRange, email, objectId]
+const FAMILY = [
+  objectId,
+  email,
+  valueRange,
+  timeRange,
+  item,
+  approval,
+  log,
+  user,
+  family, //
+]
 
 test('converts family schema', () => {
   const jsonSchema = FAMILY
