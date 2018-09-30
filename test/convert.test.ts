@@ -12,7 +12,7 @@ import {
   user,
   valueRange,
 } from './assets/jsonschema/family/index'
-import { readAsset, readDirectoryFiles, readAssetDirectory } from './utils/assets'
+import { readAsset } from './utils/assets'
 
 // Helpers
 
@@ -508,8 +508,13 @@ test('converts `oneOf` schemas to union types', () => {
   testConversion([parent, child, person], graphqlSchemaText)
 })
 
+//
+// Family tests
+
+const FAMILY = [family, user, log, item, approval, timeRange, valueRange, email, objectId]
+
 test('converts family schema', () => {
-  const jsonSchema = [family, user, log, item, approval, timeRange, valueRange, email, objectId]
+  const jsonSchema = FAMILY
   const graphqlSchemaText: string = readAsset('graphql/family.graphql')
   testConversion(jsonSchema, graphqlSchemaText)
 })
