@@ -54,7 +54,9 @@
   "dependencies": {
     "@types/jest-diff": "^20.0.0",
     "@types/jest-matcher-utils": "^21.0.1",
+    "@types/json-schema": "^7.0.1",
     "@types/pluralize": "^0.0.29",
+    "@types/ramda": "^0.25.38",
     "ajv": "^6.5.4",
     "babel-jest": "^23.6.0",
     "camelcase": "^5.0.0",
@@ -65,6 +67,7 @@
     "jest-matcher-utils": "^23.6.0",
     "lodash": "^4.17.11",
     "pluralize": "^7.0.0",
+    "ramda": "^0.25.0",
     "uppercamelcase": "^3.0.0"
   },
   "devDependencies": {
@@ -118,7 +121,7 @@
     }
   },
   "prettier": {
-    "printWidth": 75,
+    "printWidth": 100,
     "semi": false,
     "singleQuote": true,
     "trailingComma": "es5"
