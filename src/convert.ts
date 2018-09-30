@@ -20,12 +20,15 @@ import * as R from 'ramda'
 import uppercamelcase from 'uppercamelcase'
 import { esMapToObject } from './utils/esMapToObject'
 
+import { QueryBlockBuilder, ConvertParams } from './types'
+
 const err = (msg: string, propName?: string | null): Error =>
   new Error(
     `jsonschema2graphql: ${propName ? `Couldn't convert property ${propName}. ` : ''}${msg}`
   )
 
-function sanitizeEnumKey(value: string): string {
+/** Turns an enum key from JSON schema into one that is safe for GraphQL. */
+function graphqlSafeEnumKey(value: string): string {
   const trim = (s: string) => s.trim()
   const isNum = (s: string): boolean => /^[0-9]/.test(s)
   const safeNum = (s: string): string => (isNum(s) ? `VALUE_${s}` : s)
@@ -46,6 +49,7 @@ function sanitizeEnumKey(value: string): string {
   )(value)
 }
 
+/** Maps basic JSON schema types to basic GraphQL types */
 const BASIC_TYPE_MAPPING = {
   string: GraphQLString,
   integer: GraphQLInt,
@@ -53,20 +57,42 @@ const BASIC_TYPE_MAPPING = {
   boolean: GraphQLBoolean,
 }
 
-const DEFAULT_QUERY_FIELD_REDUCER = (prevResult: any, [typeName, type]: [string, GraphQLType]) => ({
-  ...prevResult,
-  [camelcase(pluralize(typeName))]: { type: new GraphQLList(type) },
-})
-
-interface Params {
-  jsonSchema: JSONSchema7 | JSONSchema7[] | string | string[]
-  queryFieldReducer?: ((prevResult: any, [typeName, type]: [string, GraphQLType]) => any)
+/** This generates the default `Query` block of the schema. */
+const DEFAULT_QUERY: QueryBlockBuilder = types => {
+  return [...types.entries()].reduce(
+    (prevResult: any, [typeName, type]: [string, GraphQLType]) => ({
+      ...prevResult,
+      [camelcase(pluralize(typeName))]: { type: new GraphQLList(type) },
+    }),
+    new Map()
+  )
 }
 
+/**
+ * @param jsonSchema - An individual schema or an array of schemas, provided
+ * either as Javascript objects or as JSON text.
+ *
+ * @param queryBlockBuilder - By default, each type gets a query field that returns
+ * an array of that type. So for example, if you have an `Person` type and a
+ * `Post` type, you'll get a query that looks like this:
+ *
+ * ```graphql
+ *    type Query {
+ *      people: [Person]
+ *      posts: [Posts]
+ *    }
+ * ```
+ *
+ * (Note that the name of the query is pluralized using the
+ * [pluralize](https://github.com/blakeembrey/pluralize) library.)
+ *
+ * To override this behavior, provide a `queryBlockBuilder` callback that takes
+ * a Map of types and returns a hash of `GraphQLFieldConfig`s.
+ */
 export default function convert({
   jsonSchema,
-  queryFieldReducer = DEFAULT_QUERY_FIELD_REDUCER,
-}: Params): GraphQLSchema {
+  queryBlockBuilder = DEFAULT_QUERY,
+}: ConvertParams): GraphQLSchema {
   // globals
   const types: Map<string, GraphQLType> = new Map()
   const enumTypes: Map<string, GraphQLEnumType> = new Map()
@@ -85,12 +111,9 @@ export default function convert({
     ...esMapToObject(types),
     query: new GraphQLObjectType({
       name: 'Query',
-      fields: [...types.entries()].reduce(queryFieldReducer, new Map()),
+      fields: queryBlockBuilder(types),
     }),
   })
-
-  //
-  //
 
   function toArray(x: JSONSchema7 | JSONSchema7[] | string | string[]): any[] {
     return jsonSchema instanceof Array
@@ -122,13 +145,9 @@ export default function convert({
     const name = uppercamelcase(propName)
     const description = getDescription(prop)
 
-    if (prop.oneOf) {
-      return buildUnionType(propName, description, prop)
-    }
+    if (prop.oneOf) return buildUnionType(name, description, prop)
 
-    if (prop.type === 'object') {
-      return buildObjectType(propName, description, prop)
-    }
+    if (prop.type === 'object') return buildObjectType(name, description, prop)
 
     if (prop.type === 'array') {
       const elementType = mapType(propName, prop.items)
@@ -138,7 +157,7 @@ export default function convert({
     if (prop.enum) {
       if (prop.type !== 'string') throw err(`Only string enums are supported.`, propName)
       const buildEnum = () => {
-        const graphqlToJsonMap = _.keyBy(prop.enum, sanitizeEnumKey)
+        const graphqlToJsonMap = _.keyBy(prop.enum, graphqlSafeEnumKey)
         const values = _.mapValues(graphqlToJsonMap, value => ({ value }))
         const enumType = new GraphQLEnumType({ name, description, values })
         enumMaps.set(propName, graphqlToJsonMap)

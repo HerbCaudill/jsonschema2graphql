@@ -1,4 +1,4 @@
-import { printSchema } from 'graphql'
+import { printSchema, GraphQLType, GraphQLOutputType } from 'graphql'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
 import convert from '../src/convert'
 import {
@@ -13,6 +13,7 @@ import {
   valueRange,
 } from './assets/jsonschema/family/index'
 import { readAsset } from './utils/assets'
+import { QueryBlockBuilder } from 'src/types'
 
 // Helpers
 
@@ -21,6 +22,14 @@ const testConversion = (jsonSchema: any, schemaText: string) => {
   const actualSchemaText = printSchema(schema)
   expect(actualSchemaText).toEqualIgnoringWhitespace(schemaText)
 }
+
+function getQueryBlock(s: string) {
+  const queryBlockRegex = /type Query \{(\S|\s)*?\}/
+  const queryBlockMatches = s.match(queryBlockRegex)
+  if (queryBlockMatches) return queryBlockMatches[0]
+  else return undefined
+}
+
 
 // Tests
 
@@ -42,7 +51,7 @@ it('correctly converts attribute types', () => {
         foo: { type: j },
       },
     }
-    const graphqlSchemaText = `
+    const expectedSchemaText = `
       type Pizza {
         foo: ${g}
       }
@@ -50,7 +59,7 @@ it('correctly converts attribute types', () => {
         pizzas: [Pizza]
       }
     `
-    testConversion(jsonSchema, graphqlSchemaText)
+    testConversion(jsonSchema, expectedSchemaText)
   })
 })
 
@@ -68,15 +77,15 @@ it('converts a literal object', () => {
       },
     },
   }
-  const graphqlSchemaText = `
-    type person {
+  const expectedSchemaText = `
+    type Person {
       name: String
       age: Int
     }
     type Query {
-      people: [person]
+      people: [Person]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 it('converts a text schema', () => {
@@ -93,15 +102,15 @@ it('converts a text schema', () => {
       }
     }
   }`
-  const graphqlSchemaText = `
-    type person {
+  const expectedSchemaText = `
+    type Person {
       name: String
       age: Int
     }
     type Query {
-      people: [person]
+      people: [Person]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 it('fails on unknown types', () => {
@@ -133,14 +142,14 @@ it('converts array type properties', () => {
       },
     },
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Array {
       attribute: [Int!]
     }
     type Query {
       arrays: [Array]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('enforces required attributes', () => {
@@ -154,7 +163,7 @@ test('enforces required attributes', () => {
     },
     required: ['somethingRequired', 'somethingElseRequired'],
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Query {
       widgets: [Widget]
     }
@@ -163,7 +172,7 @@ test('enforces required attributes', () => {
       somethingOptional: Int
       somethingElseRequired: Int!
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('handles an object with no properties', () => {
@@ -172,14 +181,14 @@ test('handles an object with no properties', () => {
     properties: {}, // <-- no properties
     type: 'object',
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type EmptyVoid {
       _empty: String
     }
     type Query {
       emptyVoids: [EmptyVoid]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('handles a reference (using $ref)', () => {
@@ -202,7 +211,7 @@ test('handles a reference (using $ref)', () => {
       },
     },
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Apple { 
       color: String 
       bestFriend: Orange 
@@ -215,7 +224,7 @@ test('handles a reference (using $ref)', () => {
       apples: [Apple] 
     }`
 
-  testConversion([orange, apple], graphqlSchemaText)
+  testConversion([orange, apple], expectedSchemaText)
 })
 
 test('handles a reference in an array property', () => {
@@ -241,7 +250,7 @@ test('handles a reference in an array property', () => {
       },
     },
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Apple { 
       color: String 
       bestFriends: [Orange!] 
@@ -254,7 +263,7 @@ test('handles a reference in an array property', () => {
       apples: [Apple] 
     }`
 
-  testConversion([orange, apple], graphqlSchemaText)
+  testConversion([orange, apple], expectedSchemaText)
 })
 
 test('fails when given an invalid $ref', () => {
@@ -281,7 +290,7 @@ test('handles self-reference', () => {
     },
   }
 
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Employee {
       name: String
       manager: Employee
@@ -289,7 +298,7 @@ test('handles self-reference', () => {
     type Query { 
       employees: [Employee] 
     }`
-  testConversion(employee, graphqlSchemaText)
+  testConversion(employee, expectedSchemaText)
 })
 
 test('handles a circular reference', () => {
@@ -313,7 +322,7 @@ test('handles a circular reference', () => {
     },
   }
 
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Apple {
       bestFriend: Orange
     }
@@ -324,7 +333,7 @@ test('handles a circular reference', () => {
       oranges: [Orange] 
       apples: [Apple] 
     }`
-  testConversion([orange, apple], graphqlSchemaText)
+  testConversion([orange, apple], expectedSchemaText)
 })
 
 test('handles enum types', () => {
@@ -339,7 +348,7 @@ test('handles enum types', () => {
     },
   }
 
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Person {
       height: PersonHeight
     }
@@ -352,7 +361,7 @@ test('handles enum types', () => {
       people: [Person] 
     }`
 
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('handles enum types with invalid characters', () => {
@@ -367,7 +376,7 @@ test('handles enum types with invalid characters', () => {
     },
   }
 
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Person {
       height: PersonHeight
     }
@@ -380,7 +389,7 @@ test('handles enum types with invalid characters', () => {
       people: [Person] 
     }`
 
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('handles enum with comparison symbols', () => {
@@ -394,7 +403,7 @@ test('handles enum with comparison symbols', () => {
       },
     },
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Comparator {
       operator: ComparatorOperator
     }
@@ -407,7 +416,7 @@ test('handles enum with comparison symbols', () => {
     type Query {
       comparators: [Comparator]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('handles enum with numeric keys', () => {
@@ -421,7 +430,7 @@ test('handles enum with numeric keys', () => {
       },
     },
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Person {
       age: PersonAge
     }
@@ -433,7 +442,7 @@ test('handles enum with numeric keys', () => {
     type Query {
       people: [Person]
     }`
-  testConversion(jsonSchema, graphqlSchemaText)
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 test('fails on enum for non-string properties', () => {
@@ -487,7 +496,7 @@ test('converts `oneOf` schemas to union types', () => {
       },
     ],
   }
-  const graphqlSchemaText = `
+  const expectedSchemaText = `
     type Child {
       type: String
       name: String
@@ -505,7 +514,7 @@ test('converts `oneOf` schemas to union types', () => {
       children: [Child] 
       people: [Person] 
     }`
-  testConversion([parent, child, person], graphqlSchemaText)
+  testConversion([parent, child, person], expectedSchemaText)
 })
 
 //
@@ -524,7 +533,27 @@ const FAMILY = [
 ]
 
 test('converts family schema', () => {
-  const jsonSchema = FAMILY
-  const graphqlSchemaText: string = readAsset('graphql/family.graphql')
-  testConversion(jsonSchema, graphqlSchemaText)
+  const jsonSchema = FAMILY as JSONSchema7
+  const expectedSchemaText: string = readAsset('graphql/family.graphql')
+  testConversion(jsonSchema, expectedSchemaText)
+})
+
+test('when given a custom queryBlockBuilder, creates a custom Query block', () => {
+  const jsonSchema = FAMILY as JSONSchema7
+
+  const queryBlockBuilder: QueryBlockBuilder = types => {
+    return {
+      family: { type: types.get('Family') as GraphQLOutputType }
+    }
+  }
+
+  const schema = convert({ jsonSchema, queryBlockBuilder })
+  const actualSchemaText = printSchema(schema)
+  const actualQueryBlock = getQueryBlock(actualSchemaText)
+    const expectedQueryBlock: string = `
+      type Query { 
+        family: Family 
+      }`
+    expect(actualQueryBlock).toEqualIgnoringWhitespace(expectedQueryBlock)
+  }
 })
