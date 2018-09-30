@@ -1,0 +1,64 @@
+type Approval {
+  user_id: ObjectId!
+  timeStamp: String!
+  approved: Boolean!
+}
+type Email {
+  _empty: String
+}
+type Family {
+  _id: ObjectId!
+  name: String!
+  users: [User!]!
+  items: [Item!]!
+}
+type Item {
+  _id: ObjectId!
+  name: String!
+  icon: String!
+  description: String!
+  isTimed: Boolean
+  coinValue: Int!
+  coinValueRange: ValueRange
+}
+type Log {
+  _id: ObjectId!
+  item_id: ObjectId!
+  coins: Float!
+  date: String!
+  time: String
+  timeRange: TimeRange
+  minutes: Int
+  isManualEntry: Boolean
+  approval: Approval
+}
+type ObjectId {
+  _empty: String
+}
+type Query {
+  families: [Family]
+  users: [User]
+  logs: [Log]
+  items: [Item]
+  approvals: [Approval]
+  timeRanges: [TimeRange]
+  valueRanges: [ValueRange]
+  emails: [Email]
+  objectIds: [ObjectId]
+}
+type TimeRange {
+  start: String
+  end: String
+}
+type User {
+  _id: ObjectId!
+  email: Email!
+  name: String!
+  nickname: String
+  isParent: Boolean
+  log: [Log!]
+}
+type ValueRange {
+  min: Float
+  max: Float
+}

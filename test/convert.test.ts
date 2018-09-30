@@ -1,6 +1,18 @@
 import { printSchema } from 'graphql'
-import convert from '../src/convert'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
+import convert from '../src/convert'
+import {
+  approval,
+  email,
+  family,
+  item,
+  log,
+  objectId,
+  timeRange,
+  user,
+  valueRange,
+} from './assets/jsonschema/family/index'
+import { readAsset, readDirectoryFiles, readAssetDirectory } from './utils/assets'
 
 // Helpers
 
@@ -131,7 +143,7 @@ it('converts array type properties', () => {
   testConversion(jsonSchema, graphqlSchemaText)
 })
 
-test('enforces required attributes', async () => {
+test('enforces required attributes', () => {
   const jsonSchema = {
     $id: 'Widget',
     type: 'object',
@@ -154,7 +166,7 @@ test('enforces required attributes', async () => {
   testConversion(jsonSchema, graphqlSchemaText)
 })
 
-test('fails if an object has no properties', async () => {
+test('fails if an object has no properties', () => {
   const jsonSchema = {
     $id: 'EmptyVoid',
     properties: {}, // <-- no properties
@@ -170,7 +182,7 @@ test('fails if an object has no properties', async () => {
   testConversion(jsonSchema, graphqlSchemaText)
 })
 
-test('handles a reference (using $ref)', async () => {
+test('handles a reference (using $ref)', () => {
   const orange = {
     $id: 'Orange',
     type: 'object',
@@ -206,7 +218,7 @@ test('handles a reference (using $ref)', async () => {
   testConversion([orange, apple], graphqlSchemaText)
 })
 
-test('handles an embedded reference', async () => {
+test('handles an embedded reference', () => {
   const orange = {
     $id: 'Orange',
     type: 'object',
@@ -240,7 +252,7 @@ test('handles an embedded reference', async () => {
   testConversion([orange, apple], graphqlSchemaText)
 })
 
-test('handles a reference in an array property', async () => {
+test('handles a reference in an array property', () => {
   const orange = {
     $id: 'Orange',
     type: 'object',
@@ -279,7 +291,7 @@ test('handles a reference in an array property', async () => {
   testConversion([orange, apple], graphqlSchemaText)
 })
 
-test('fails when given an invalid $ref', async () => {
+test('fails when given an invalid $ref', () => {
   const jsonSchema: JSONSchema7 = {
     $id: 'Apple',
     type: 'object',
@@ -293,7 +305,7 @@ test('fails when given an invalid $ref', async () => {
   expect(conversion).toThrowError()
 })
 
-test('handles self-reference', async () => {
+test('handles self-reference', () => {
   const employee: JSONSchema7 = {
     $id: 'Employee',
     type: 'object',
@@ -314,7 +326,7 @@ test('handles self-reference', async () => {
   testConversion(employee, graphqlSchemaText)
 })
 
-test('handles a circular reference', async () => {
+test('handles a circular reference', () => {
   const apple = {
     $id: 'Apple',
     type: 'object',
@@ -473,7 +485,7 @@ test('fails on enum for non-string properties', () => {
   expect(conversion).toThrowError()
 })
 
-test('converts `oneOf` schemas to union types', async () => {
+test('converts `oneOf` schemas to union types', () => {
   const parent: JSONSchema7 = {
     $id: 'Parent',
     type: 'object',
@@ -528,4 +540,10 @@ test('converts `oneOf` schemas to union types', async () => {
       people: [Person] 
     }`
   testConversion([parent, child, person], graphqlSchemaText)
+})
+
+test('converts family schema', () => {
+  const jsonSchema = [family, user, log, item, approval, timeRange, valueRange, email, objectId]
+  const graphqlSchemaText: string = readAsset('graphql/family.graphql')
+  testConversion(jsonSchema, graphqlSchemaText)
 })
