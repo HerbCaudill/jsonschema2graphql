@@ -218,40 +218,6 @@ test('handles a reference (using $ref)', () => {
   testConversion([orange, apple], graphqlSchemaText)
 })
 
-test('handles an embedded reference', () => {
-  const orange = {
-    $id: 'Orange',
-    type: 'object',
-    properties: {
-      color: {
-        type: 'string',
-      },
-    },
-  }
-  const apple = {
-    $id: 'Apple',
-    type: 'object',
-    properties: {
-      color: { type: 'string' },
-      bestFriend: orange, // <- reference foreign type inline
-    },
-  }
-  const graphqlSchemaText = `
-    type Apple { 
-      color: String 
-      bestFriend: Orange 
-    } 
-    type Orange { 
-      color: String 
-    } 
-    type Query { 
-      oranges: [Orange]
-      apples: [Apple] 
-    }`
-
-  testConversion([orange, apple], graphqlSchemaText)
-})
-
 test('handles a reference in an array property', () => {
   const orange = {
     $id: 'Orange',
