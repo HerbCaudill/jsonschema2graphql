@@ -166,7 +166,7 @@ test('enforces required attributes', () => {
   testConversion(jsonSchema, graphqlSchemaText)
 })
 
-test('fails if an object has no properties', () => {
+test('handles an object with no properties', () => {
   const jsonSchema = {
     $id: 'EmptyVoid',
     properties: {}, // <-- no properties
