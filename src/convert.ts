@@ -4,8 +4,6 @@ import {
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
-  GraphQLInputObjectType,
-  GraphQLInputType,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
@@ -60,8 +58,6 @@ const DEFAULT_QUERY_FIELD_REDUCER = (prevResult: any, [typeName, type]: [string,
   [camelcase(pluralize(typeName))]: { type: new GraphQLList(type) },
 })
 
-const INPUT_SUFFIX = 'Input'
-
 interface Params {
   jsonSchema: JSONSchema7 | JSONSchema7[] | string | string[]
   queryFieldReducer?: ((prevResult: any, [typeName, type]: [string, GraphQLType]) => any)
@@ -73,7 +69,6 @@ export default function convert({
 }: Params): GraphQLSchema {
   // globals
   const types: Map<string, GraphQLType> = new Map()
-  const inputs: Map<string, GraphQLInputType> = new Map()
   const enumTypes: Map<string, GraphQLEnumType> = new Map()
   const enumMaps: Map<string, _.Dictionary<string>> = new Map()
 
@@ -109,37 +104,41 @@ export default function convert({
       : JSON.parse(x) // string -> object
   }
 
-  function processSchema(schema: JSONSchema7): InputOutput {
+  function getDescription(d: any): string {
+    return ''
+  }
+
+  function processSchema(schema: JSONSchema7): GraphQLType {
     const typeName = schema.$id
+    const description = getDescription(schema)
+
     if (typeof typeName === 'undefined') throw err('Schema does not have an `$id` property.')
 
     const typeBuilder = schema.oneOf ? buildUnionType : buildObjectType
-    const { output, input } = typeBuilder(typeName, schema)
-
-    types.set(typeName, output)
-    if (input) inputs.set(typeName, input)
-
-    return { output, input }
+    const type = typeBuilder(typeName, description, schema)
+    types.set(typeName, type)
+    return type
   }
 
-  interface InputOutput {
-    readonly input?: GraphQLInputObjectType
-    readonly output: GraphQLType
-  }
+  function mapType(propName: string, prop: any): GraphQLType {
+    const name = uppercamelcase(propName)
+    const description: string | undefined = prop.description
 
-  function mapType(prop: any, propName: string, isInputType: boolean = false): GraphQLType {
+    if (prop.oneOf) {
+      const type = buildUnionType(propName, description, prop)
+    }
+
     if (prop.type === 'array') {
-      const elementType = mapType(prop.items, propName, isInputType)
+      const elementType = mapType(propName, prop.items)
       return new GraphQLList(new GraphQLNonNull(elementType))
     }
 
     if (prop.enum) {
       if (prop.type !== 'string') throw err(`Only string enums are supported.`, propName)
       const buildEnum = () => {
-        const name = uppercamelcase(propName)
         const graphqlToJsonMap = _.keyBy(prop.enum, sanitizeEnumKey)
         const values = _.mapValues(graphqlToJsonMap, value => ({ value }))
-        const enumType = new GraphQLEnumType({ name, values })
+        const enumType = new GraphQLEnumType({ name, description, values })
         enumMaps.set(propName, graphqlToJsonMap)
         enumTypes.set(propName, enumType)
         return enumType
@@ -150,8 +149,7 @@ export default function convert({
 
     const typeRef = prop.$ref
     if (typeRef) {
-      const typeMap = isInputType ? inputs : types
-      const type = typeMap.get(typeRef)
+      const type = types.get(typeRef)
       if (!type) throw err(`The referenced type ${typeRef} is unknown.`, propName)
       return type
     }
@@ -162,43 +160,43 @@ export default function convert({
     throw err(`The type ${prop.type} on property ${propName} is unknown.`)
   }
 
-  function buildFields(parentTypeName: string, schema: any, isInputType: boolean = false): any {
-    return _.isEmpty(schema.properties)
-      ? // GraphQL doesn't allow types with no fields, so put a placeholder
-        { _empty: { type: GraphQLString } }
-      : _.mapValues(schema.properties, (prop, propKey) => {
-          const qualifiedPropKey = `${parentTypeName}.${propKey}`
-          const type = mapType(prop, qualifiedPropKey, isInputType)
+  function buildFields(parentTypeName: string, schema: any): any {
+    return !_.isEmpty(schema.properties)
+      ? _.mapValues(schema.properties, (prop, propKey) => {
+          const qualifiedPropName = `${parentTypeName}.${propKey}`
+          const type = mapType(qualifiedPropName, prop)
           const isRequired = _.includes(schema.required, propKey)
           return {
             type: isRequired ? new GraphQLNonNull(type) : type,
           }
         })
+      : // GraphQL doesn't allow types with no fields, so put a placeholder
+        { _empty: { type: GraphQLString } }
   }
 
-  function buildObjectType(typeName: string, schema: any): InputOutput {
-    const output = new GraphQLObjectType({
-      fields: () => buildFields(typeName, schema),
-      name: typeName,
+  function buildObjectType(
+    name: string,
+    description: string | undefined,
+    schema: any
+  ): GraphQLObjectType {
+    return new GraphQLObjectType({
+      name,
+      description,
+      fields: () => buildFields(name, schema),
     })
-    const input = new GraphQLInputObjectType({
-      fields: () => buildFields(typeName, schema, true),
-      name: typeName + INPUT_SUFFIX,
-    })
-    return { input, output }
   }
 
-  function buildUnionType(typeName: string, schema: any): InputOutput {
+  function buildUnionType(
+    name: string,
+    description: string | undefined,
+    schema: any
+  ): GraphQLUnionType {
     const types = () =>
-      _.map(schema.oneOf, (switchCase, caseIndex) => {
-        const result = mapType(switchCase.then, `${typeName}.oneOf[${caseIndex}]`)
-        if (!(result instanceof GraphQLObjectType)) throw new Error() // Can't happen - keeping TS happy
-        return result
-      })
-    const output = new GraphQLUnionType({
-      name: typeName,
-      types,
-    })
-    return { output }
+      _.map(
+        schema.oneOf,
+        (switchCase, caseIndex) =>
+          mapType(`${name}.oneOf[${caseIndex}]`, switchCase.then) as GraphQLObjectType
+      )
+    return new GraphQLUnionType({ name, description, types })
   }
 }
