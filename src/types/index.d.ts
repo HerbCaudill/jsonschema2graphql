@@ -14,11 +14,18 @@ import {
   GraphQLFieldConfig,
 } from 'graphql'
 
-export type QueryBlockBuilder = (
-  types: Map<string, GraphQLType>
-) => _.Dictionary<GraphQLFieldConfig<string, GraphQLType>>
+export type TypeMap = Map<string, GraphQLType>
+// export type FieldDictionary = _.Dictionary<GraphQLFieldConfig<string, GraphQLType>>
+
+export type EntryPointBuilder = (
+  types: TypeMap
+) => {
+  query: GraphQLObjectType
+  mutation?: GraphQLObjectType
+  subscription?: GraphQLObjectType
+}
 
 export interface ConvertParams {
   jsonSchema: JSONSchema7 | JSONSchema7[] | string | string[]
-  queryBlockBuilder?: QueryBlockBuilder
+  entryPoints?: EntryPointBuilder
 }

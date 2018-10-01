@@ -1,4 +1,4 @@
-import { printSchema, GraphQLType, GraphQLOutputType } from 'graphql'
+import { printSchema, GraphQLType, GraphQLOutputType, GraphQLObjectType } from 'graphql'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
 import convert from '../src/convert'
 import {
@@ -13,7 +13,7 @@ import {
   valueRange,
 } from './assets/jsonschema/family/index'
 import { readAsset } from './utils/assets'
-import { QueryBlockBuilder } from 'src/types'
+import { QueryBlockBuilder, EntryPointBuilder } from 'src/types'
 
 // Helpers
 
@@ -23,13 +23,12 @@ const testConversion = (jsonSchema: any, schemaText: string) => {
   expect(actualSchemaText).toEqualIgnoringWhitespace(schemaText)
 }
 
-function getQueryBlock(s: string) {
-  const queryBlockRegex = /type Query \{(\S|\s)*?\}/
+function getDefinition(typeName: string, s: string) {
+  const queryBlockRegex = new RegExp(`type ${typeName} \\{(\\S|\\s)*?\\}`)
   const queryBlockMatches = s.match(queryBlockRegex)
   if (queryBlockMatches) return queryBlockMatches[0]
   else return undefined
 }
-
 
 // Tests
 
@@ -521,7 +520,7 @@ test('converts `oneOf` schemas to union types', () => {
 // Family tests
 
 const FAMILY = [
-  objectId,
+  objectId, //
   email,
   valueRange,
   timeRange,
@@ -529,7 +528,7 @@ const FAMILY = [
   approval,
   log,
   user,
-  family, //
+  family,
 ]
 
 test('converts family schema', () => {
@@ -538,22 +537,42 @@ test('converts family schema', () => {
   testConversion(jsonSchema, expectedSchemaText)
 })
 
-test('when given a custom queryBlockBuilder, creates a custom Query block', () => {
+test('builds custom query and mutation blocks', () => {
   const jsonSchema = FAMILY as JSONSchema7
 
-  const queryBlockBuilder: QueryBlockBuilder = types => {
+  const entryPoints: EntryPointBuilder = types => {
     return {
-      family: { type: types.get('Family') as GraphQLOutputType }
+      query: new GraphQLObjectType({
+        name: 'Query',
+        fields: {
+          family: { type: types.get('Family') as GraphQLOutputType },
+        },
+      }),
+      mutation: new GraphQLObjectType({
+        name: 'Mutation',
+        fields: {
+          stop: { type: types.get('Log') as GraphQLOutputType },
+        },
+      }),
     }
   }
 
-  const schema = convert({ jsonSchema, queryBlockBuilder })
+  const schema = convert({ jsonSchema, entryPoints })
   const actualSchemaText = printSchema(schema)
-  const actualQueryBlock = getQueryBlock(actualSchemaText)
-    const expectedQueryBlock: string = `
-      type Query { 
-        family: Family 
+
+  // Query
+  const actualQueryBlock = getDefinition('Query', actualSchemaText)
+  const expectedQueryBlock: string = `
+      type Query {
+        family: Family
       }`
-    expect(actualQueryBlock).toEqualIgnoringWhitespace(expectedQueryBlock)
-  }
+  expect(actualQueryBlock).toEqualIgnoringWhitespace(expectedQueryBlock)
+
+  // Mutation
+  const actualMutationBlock = getDefinition('Mutation', actualSchemaText)
+  const expectedMutationBlock: string = `
+      type Mutation {
+        stop: Log
+      }`
+  expect(actualMutationBlock).toEqualIgnoringWhitespace(expectedMutationBlock)
 })
