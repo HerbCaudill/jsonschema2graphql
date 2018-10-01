@@ -1,8 +1,8 @@
 import { GraphQLObjectType, GraphQLOutputType, printSchema } from 'graphql'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
-import { EntryPointBuilder } from 'src/types'
 
 import convert from '../src/convert'
+import { EntryPointBuilder } from '../src/types'
 import {
   approval,
   email,
@@ -460,7 +460,7 @@ test('fails on enum for non-string properties', () => {
   expect(conversion).toThrowError()
 })
 
-test('converts `oneOf` schemas to union types', () => {
+test('converts `oneOf` schemas (with if/then) to union types', () => {
   const parent: JSONSchema7 = {
     $id: 'Parent',
     type: 'object',
@@ -495,6 +495,54 @@ test('converts `oneOf` schemas to union types', () => {
         then: { $ref: 'Child' },
       },
     ],
+  }
+  const expectedSchemaText = `
+    type Child {
+      type: String
+      name: String
+      parent: Parent
+      bestFriend: Person
+      friends: [Person!]
+    }
+    type Parent {
+      type: String
+      name: String
+    }
+    union Person = Parent | Child
+    type Query { 
+      parents: [Parent] 
+      children: [Child] 
+      people: [Person] 
+    }`
+  testConversion([parent, child, person], expectedSchemaText)
+})
+
+test('converts `oneOf` schemas to union types', () => {
+  const parent: JSONSchema7 = {
+    $id: 'Parent',
+    type: 'object',
+    properties: {
+      type: { type: 'string' },
+      name: { type: 'string' },
+    },
+  }
+  const child: JSONSchema7 = {
+    $id: 'Child',
+    type: 'object',
+    properties: {
+      type: { type: 'string' },
+      name: { type: 'string' },
+      parent: { $ref: 'Parent' },
+      bestFriend: { $ref: 'Person' },
+      friends: {
+        type: 'array',
+        items: { $ref: 'Person' },
+      },
+    },
+  }
+  const person: JSONSchema7 = {
+    $id: 'Person',
+    oneOf: [{ $ref: 'Parent' }, { $ref: 'Child' }],
   }
   const expectedSchemaText = `
     type Child {

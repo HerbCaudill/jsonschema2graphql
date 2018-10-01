@@ -1,6 +1,9 @@
 import Ajv from 'ajv'
 import {
+  GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
+  GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -10,64 +13,56 @@ import {
 } from 'graphql'
 import { JSONSchema7 } from 'json-schema'
 import _ from 'lodash'
-import R from 'ramda'
 import uppercamelcase from 'uppercamelcase'
 
-import { BASIC_TYPE_MAPPING, err } from './helpers'
+import { graphqlSafeEnumKey } from './graphqlSafeEnumKey'
+import { err } from './helpers'
 import { GraphQLTypeMap } from './types'
 
-export function schemaReducer(types: GraphQLTypeMap, schema: JSONSchema7) {
-  new Ajv().validateSchema(schema) // validate against the json schema schema
+/** Maps basic JSON schema types to basic GraphQL types */
+const BASIC_TYPE_MAPPING = {
+  string: GraphQLString,
+  integer: GraphQLInt,
+  number: GraphQLFloat,
+  boolean: GraphQLBoolean,
+}
+export function schemaReducer(knownTypes: GraphQLTypeMap, schema: JSONSchema7) {
+  // validate against the json schema schema
+  new Ajv().validateSchema(schema)
 
   const typeName = schema.$id
   if (typeof typeName === 'undefined') throw err('Schema does not have an `$id` property.')
 
-  const type = mapType(typeName, schema)
-  types[typeName] = type
-  return types
+  knownTypes[typeName] = buildType(typeName, schema, knownTypes)
+  return knownTypes
+}
 
-  function mapType(propName: string, prop: any): GraphQLType {
-    const name = uppercamelcase(propName)
-    const description = buildDescription(prop)
+function buildType(propName: string, schema: JSONSchema7, knownTypes: GraphQLTypeMap): GraphQLType {
+  const name = uppercamelcase(propName)
 
-    // union?
-    if (prop.oneOf) return buildUnionType(name, description, prop)
-
-    // object?
-    if (prop.type === 'object') return buildObjectType(name, description, prop)
-
-    // array?
-    if (prop.type === 'array') return buildArrayType(name, prop)
-
-    // enum?
-    if (prop.enum) return buildEnumType(name, description, prop)
-
-    // ref?
-    if (prop.$ref) return buildRefType(name, prop)
-
-    // basic?
-    if (BASIC_TYPE_MAPPING[prop.type]) return BASIC_TYPE_MAPPING[prop.type]
-
-    // ¯\_(ツ)_/¯
-    throw err(`The type ${prop.type} on property ${name} is unknown.`)
-  }
-
-  function buildUnionType(name: string, description: string | undefined, schema: any): GraphQLUnionType {
-    const types = () =>
-      _.map(
-        schema.oneOf,
-        (switchCase, caseIndex) => mapType(`${name}.oneOf[${caseIndex}]`, switchCase.then) as GraphQLObjectType
-      )
+  // oneOf?
+  if (!_.isUndefined(schema.oneOf)) {
+    const cases = schema.oneOf as JSONSchema7
+    const caseKeys = Object.keys(cases)
+    const types: GraphQLObjectType[] = caseKeys.map((caseName: string) => {
+      const caseSchema = cases[caseName]
+      const qualifiedName = `${name}.oneOf[${caseName}]`
+      const typeSchema = (caseSchema.then || caseSchema) as JSONSchema7
+      return buildType(qualifiedName, typeSchema, knownTypes) as GraphQLObjectType
+    })
+    const description = buildDescription(schema)
     return new GraphQLUnionType({ name, description, types })
   }
 
-  function buildObjectType(name: string, description: string | undefined, schema: any): GraphQLObjectType {
+  // object?
+  else if (schema.type === 'object') {
+    const description = buildDescription(schema)
     const fields = () =>
       !_.isEmpty(schema.properties)
-        ? _.mapValues(schema.properties, (prop, propKey) => {
-            const qualifiedPropName = `${name}.${propKey}`
-            const type = mapType(qualifiedPropName, prop) as GraphQLObjectType
-            const isRequired = _.includes(schema.required, propKey)
+        ? _.mapValues(schema.properties, (prop: JSONSchema7, fieldName) => {
+            const qualifiedFieldName = `${name}.${fieldName}`
+            const type = buildType(qualifiedFieldName, prop, knownTypes) as GraphQLObjectType
+            const isRequired = _.includes(schema.required, fieldName)
             return {
               type: isRequired ? new GraphQLNonNull(type) : type,
               description: buildDescription(prop),
@@ -78,54 +73,39 @@ export function schemaReducer(types: GraphQLTypeMap, schema: JSONSchema7) {
     return new GraphQLObjectType({ name, description, fields })
   }
 
-  function buildArrayType(name: string, prop: any) {
-    {
-      const elementType = mapType(name, prop.items)
-      return new GraphQLList(new GraphQLNonNull(elementType))
-    }
+  // array?
+  else if (schema.type === 'array') {
+    const elementType = buildType(name, schema.items as JSONSchema7, knownTypes)
+    return new GraphQLList(new GraphQLNonNull(elementType))
   }
 
-  function buildEnumType(name: string, description: string | undefined, prop: any) {
-    {
-      if (prop.type !== 'string') throw err(`Only string enums are supported.`, name)
-      const graphqlToJsonMap = _.keyBy(prop.enum, graphqlSafeEnumKey)
-      const values = _.mapValues(graphqlToJsonMap, value => ({ value }))
-      const enumType = new GraphQLEnumType({ name, description, values })
-      return enumType
-    }
+  // enum?
+  else if (!_.isUndefined(schema.enum)) {
+    if (schema.type !== 'string') throw err(`Only string enums are supported.`, name)
+    const description = buildDescription(schema)
+    const graphqlToJsonMap = _.keyBy(schema.enum, graphqlSafeEnumKey)
+    const values = _.mapValues(graphqlToJsonMap, value => ({ value }))
+    const enumType = new GraphQLEnumType({ name, description, values })
+    return enumType
   }
 
-  function buildRefType(name: string, prop: any) {
-    {
-      const type = types[prop.$ref]
-      if (!type) throw err(`The referenced type ${prop.$ref} is unknown.`, name)
-      return type
-    }
+  // $ref?
+  else if (!_.isUndefined(schema.$ref)) {
+    const type = knownTypes[schema.$ref as string]
+    if (!type) throw err(`The referenced type ${schema.$ref} is unknown.`, name)
+    return type
   }
+
+  // basic?
+  else if (BASIC_TYPE_MAPPING[schema.type as string]) {
+    return BASIC_TYPE_MAPPING[schema.type as string]
+  }
+
+  // ¯\_(ツ)_/¯
+  else throw err(`The type ${schema.type} on property ${name} is unknown.`)
 }
 
 function buildDescription(d: any): string | undefined {
   if (d.title && d.description) return `${d.title}: ${d.description}`
   return d.title || d.description || undefined
-}
-
-/** Turns an enum key from JSON schema into one that is safe for GraphQL. */
-function graphqlSafeEnumKey(value: string): string {
-  const trim = (s: string) => s.trim()
-  const isNum = (s: string): boolean => /^[0-9]/.test(s)
-  const safeNum = (s: string): string => (isNum(s) ? `VALUE_${s}` : s)
-  const convertComparators = (s: string): string =>
-    ({
-      '<': 'LT',
-      '<=': 'LTE',
-      '>=': 'GTE',
-      '>': 'GT',
-    }[s] || s)
-  const sanitize = (s: string) => s.replace(/[^_a-zA-Z0-9]/g, '_')
-  return R.compose(
-    sanitize,
-    convertComparators,
-    safeNum,
-    trim
-  )(value)
 }

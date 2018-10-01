@@ -1,0 +1,9 @@
+{
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "rules": {
+    "curly": false,
+    "no-implicit-dependencies": false,
+    "object-literal-sort-keys": false,
+    "no-string-literal": false
+  }
+}

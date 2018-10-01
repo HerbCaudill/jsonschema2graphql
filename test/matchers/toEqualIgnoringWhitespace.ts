@@ -1,5 +1,5 @@
-import { matcherHint, printReceived, printExpected } from 'jest-matcher-utils'
 import diff from 'jest-diff'
+import { matcherHint } from 'jest-matcher-utils'
 
 const compressWhitespace = (a: string[]) =>
   a.map(s =>
@@ -20,10 +20,7 @@ const toEqualIgnoringWhitespace = (actual: string, expected: string) => {
     ? () => `${matcherHint(`.not.${name}`)}\n\n`
     : () => {
         const diffString = diff(expectedComp, actualComp)
-        return (
-          `${matcherHint(`.${name}`)}\n\n` +
-          `${diffString ? `\n\nDifference:\n\n${diffString}` : ``}`
-        )
+        return `${matcherHint(`.${name}`)}\n\n${diffString ? `\n\nDifference:\n\n${diffString}` : ``}`
       }
   return { actual, expected, message, name, pass }
 }

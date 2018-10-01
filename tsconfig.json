@@ -11,7 +11,10 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es2017"
+    "target": "es5",
+    "paths": {
+      "*": ["./@types/*"]
+    }
   },
   "exclude": ["node_modules"]
 }

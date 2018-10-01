@@ -1,5 +1,4 @@
 import { pattern } from './pattern'
-import { objectId } from './objectId'
 
 export const approval = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -25,8 +24,7 @@ export const approval = {
     approved: {
       type: 'boolean',
       title: 'Approved',
-      description:
-        'If an existing approval entry has a value of `approved=false`, then the log item was rejected.',
+      description: 'If an existing approval entry has a value of `approved=false`, then the log item was rejected.',
     },
   },
 }

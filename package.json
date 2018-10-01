@@ -12,12 +12,8 @@
     "all": "run-s reset test cov:check doc:html",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
-    "build": "run-s clean && run-p build:*",
+    "build": "run-s clean && run-p build:*", 
     "clean": "trash build",
-    "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
-    "cov:html": "nyc report --reporter=html",
-    "cov:send": "nyc report --reporter=lcov > coverage.lcov && codecov",
-    "cov": "run-s build test:unit cov:html && opn coverage/index.html",
     "doc:html": "typedoc src/ --target ES6 --mode file --out build/docs",
     "doc:json": "typedoc src/ --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
@@ -29,11 +25,10 @@
     "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('jsonschema2graphql must be installed with Yarn: https://yarnpkg.com/')\"",
     "prepare-release": "run-s all version doc:publish",
     "reset": "git clean -dfx && git reset --hard && npm i",
-    "test:lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "jest",
-    "test": "run-s build test:*",
+    "lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
+    "test": "jest",
     "version": "standard-version",
-    "watch": "run-s clean build:main && run-p \"build:main -- -w\" \"test:unit --watch\""
+    "watch": "run-s clean build:main && run-p \"build:main -- -w\" \"test --watch\""
   },
   "engines": {
     "node": ">=8.9"
@@ -48,7 +43,6 @@
     "ajv": "^6.5.4",
     "babel-jest": "^23.6.0",
     "camelcase": "^5.0.0",
-    "escodegen": "^1.11.0",
     "fs-extra": "^7.0.0",
     "graphql": "^14.0.2",
     "jest-diff": "^23.6.0",
@@ -60,16 +54,13 @@
   },
   "devDependencies": {
     "@types/camelcase": "^4.1.0",
-    "@types/escodegen": "^0.0.6",
     "@types/graphql": "^14.0.1",
     "@types/jest": "^23.3.1",
     "@types/uppercamelcase": "^3.0.0",
-    "codecov": "^3.1.0",
     "cz-conventional-changelog": "^2.1.0",
     "gh-pages": "^2.0.0",
     "jest": "22.4.2",
     "npm-run-all": "^4.1.3",
-    "nyc": "^13.0.1",
     "opn-cli": "^3.1.0",
     "prettier": "^1.14.3",
     "standard-version": "^4.4.0",
@@ -78,7 +69,6 @@
     "ts-jest": "22.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "tslint-immutable": "^4.7.0",
     "typedoc": "^0.12.0",
     "typescript": "^3.0.3"
   },
@@ -97,7 +87,7 @@
     ],
     "testEnvironment": "node",
     "testMatch": [
-      "**/?(*.)test.ts?(x)"
+      "**/?(*.)test.ts"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
@@ -114,10 +104,5 @@
     "semi": false,
     "singleQuote": true,
     "trailingComma": "es5"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js"
-    ]
   }
 }

@@ -6,10 +6,10 @@ export const readFile = (filePath: string) => {
   return fs.readFileSync(qualifiedFilePath, 'utf8')
 }
 
-export const readAsset = (path: string): any => {
-  var result = readFile(`../assets/${path}`)
-  if (path.endsWith('json')) result = JSON.parse(result)
-  return result
+export const readAsset = (fileName: string): any => {
+  const result = readFile(`../assets/${fileName}`)
+  if (fileName.endsWith('json')) return JSON.parse(result)
+  else return result
 }
 export const readAssetDirectory = (dirPath: string) => {
   const qualifiedDirPath = path.join(__dirname, '../assets/', dirPath)

@@ -1,24 +1,8 @@
 import camelcase from 'camelcase'
-import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLType,
-} from 'graphql'
+import { GraphQLList, GraphQLObjectType, GraphQLType } from 'graphql'
 import pluralize from 'pluralize'
 
 import { EntryPointBuilder } from './types'
-
-/** Maps basic JSON schema types to basic GraphQL types */
-export const BASIC_TYPE_MAPPING = {
-  string: GraphQLString,
-  integer: GraphQLInt,
-  number: GraphQLFloat,
-  boolean: GraphQLBoolean,
-}
 
 /** This generates the default `Query` block of the schema. */
 export const DEFAULT_ENTRY_POINTS: EntryPointBuilder = types => ({
