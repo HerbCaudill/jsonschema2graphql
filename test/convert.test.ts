@@ -1,5 +1,7 @@
-import { printSchema, GraphQLType, GraphQLOutputType, GraphQLObjectType } from 'graphql'
+import { GraphQLObjectType, GraphQLOutputType, printSchema } from 'graphql'
 import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
+import { EntryPointBuilder } from 'src/types'
+
 import convert from '../src/convert'
 import {
   approval,
@@ -11,9 +13,8 @@ import {
   timeRange,
   user,
   valueRange,
-} from './assets/jsonschema/family/index'
+} from './assets/jsonschema/family'
 import { readAsset } from './utils/assets'
-import { QueryBlockBuilder, EntryPointBuilder } from 'src/types'
 
 // Helpers
 
@@ -545,13 +546,13 @@ test('builds custom query and mutation blocks', () => {
       query: new GraphQLObjectType({
         name: 'Query',
         fields: {
-          family: { type: types.get('Family') as GraphQLOutputType },
+          family: { type: types['Family'] as GraphQLOutputType },
         },
       }),
       mutation: new GraphQLObjectType({
         name: 'Mutation',
         fields: {
-          stop: { type: types.get('Log') as GraphQLOutputType },
+          stop: { type: types['Log'] as GraphQLOutputType },
         },
       }),
     }

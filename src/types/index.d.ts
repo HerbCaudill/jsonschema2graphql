@@ -1,24 +1,12 @@
+import { GraphQLObjectType, GraphQLType } from 'graphql'
 import { JSONSchema7 } from 'json-schema'
-import {
-  GraphQLBoolean,
-  GraphQLEnumType,
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLSchema,
-  GraphQLString,
-  GraphQLType,
-  GraphQLUnionType,
-  GraphQLFieldConfig,
-} from 'graphql'
 
-export type TypeMap = Map<string, GraphQLType>
-// export type FieldDictionary = _.Dictionary<GraphQLFieldConfig<string, GraphQLType>>
+export interface GraphQLTypeMap {
+  [name: string]: GraphQLType
+}
 
 export type EntryPointBuilder = (
-  types: TypeMap
+  types: GraphQLTypeMap
 ) => {
   query: GraphQLObjectType
   mutation?: GraphQLObjectType
