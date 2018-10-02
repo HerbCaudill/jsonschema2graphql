@@ -1,6 +1,6 @@
 {
   "name": "jsonschema2graphql",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Converts JSON schema to GraphQL types",
   "repository": "github:HerbCaudill/jsonschema2graphql",
   "homepage": "https://github.com/HerbCaudill/jsonschema2graphql#readme",
@@ -53,15 +53,15 @@
     "uppercamelcase": "^3.0.0"
   },
   "devDependencies": {
+    "@types/camelcase": "^4.1.0",
     "@types/fs-extra": "^5.0.4",
+    "@types/graphql": "^14.0.1",
+    "@types/jest": "^23.3.1",
     "@types/jest-diff": "^20.0.0",
     "@types/jest-matcher-utils": "^21.0.1",
     "@types/json-schema": "^7.0.1",
     "@types/pluralize": "^0.0.29",
     "@types/ramda": "^0.25.38",
-    "@types/camelcase": "^4.1.0",
-    "@types/graphql": "^14.0.1",
-    "@types/jest": "^23.3.1",
     "@types/uppercamelcase": "^3.0.0",
     "gh-pages": "^2.0.0",
     "jest": "22.4.2",
