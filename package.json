@@ -24,7 +24,7 @@
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
     "fix": "run-s fix:*",
-    "prepublish": "run-s clean build test",
+    "prepublishOnly": "run-s clean build test",
     "preview": "package-preview",
     "reset": "git clean -dfx && git reset --hard && yarn install",
     "lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
