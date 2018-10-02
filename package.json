@@ -1,6 +1,6 @@
 {
   "name": "jsonschema2graphql",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Converts JSON schema to GraphQL types",
   "repository": "github:HerbCaudill/jsonschema2graphql",
   "homepage": "https://github.com/HerbCaudill/jsonschema2graphql#readme",
@@ -16,8 +16,8 @@
     "json-schema",
     "graphql"
   ],
-  "main": "build/main/index.ts",
-  "typings": "build/main/index.d.ts",
+  "main": "build/main/src/index.js",
+  "typings": "src/types/index.d.ts",
   "scripts": {
     "all": "run-s reset test doc:html",
     "build": "tsc -p tsconfig.json",
