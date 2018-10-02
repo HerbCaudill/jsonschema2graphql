@@ -16,7 +16,7 @@
     "json-schema",
     "graphql"
   ],
-  "main": "build/main/index.js",
+  "main": "build/main/index.ts",
   "typings": "build/main/index.d.ts",
   "scripts": {
     "all": "run-s reset test doc:html",
