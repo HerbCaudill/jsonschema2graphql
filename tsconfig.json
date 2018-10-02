@@ -11,10 +11,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es5",
-    "paths": {
-      "*": ["./@types/*"]
-    }
+    "target": "es5"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules/**"]
 }
