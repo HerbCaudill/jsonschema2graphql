@@ -1,5 +1,10 @@
-import { GraphQLObjectType, GraphQLOutputType, printSchema } from 'graphql'
-import { JSONSchema7, JSONSchema7TypeName } from 'json-schema'
+import {
+  GraphQLInputType,
+  GraphQLObjectType,
+  GraphQLOutputType,
+  printSchema,
+} from 'graphql'
+import { JSONSchema7 } from 'json-schema'
 
 import convert from '../src/convert'
 import { EntryPointBuilder } from '../src/types'
@@ -33,34 +38,29 @@ function getDefinition(typeName: string, s: string) {
 
 // Tests
 
-it('correctly converts attribute types', () => {
-  const types = [
-    { j: 'string', g: 'String' },
-    { j: 'integer', g: 'Int' },
-    { j: 'number', g: 'Float' },
-    { j: 'boolean', g: 'Boolean' },
-  ]
-
-  expect.assertions(types.length)
-
-  types.forEach(({ j, g }: { j: JSONSchema7TypeName; g: string }) => {
-    const jsonSchema: JSONSchema7 = {
-      $id: 'Pizza',
-      type: 'object',
-      properties: {
-        foo: { type: j },
-      },
+it('correctly converts basic attribute types', () => {
+  const jsonSchema: JSONSchema7 = {
+    $id: 'Person',
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      age: { type: 'integer' },
+      score: { type: 'number' },
+      isMyFriend: { type: 'boolean' },
+    },
+  }
+  const expectedSchemaText = `
+    type Person {
+      name: String
+      age: Int
+      score: Float 
+      isMyFriend: Boolean
     }
-    const expectedSchemaText = `
-      type Pizza {
-        foo: ${g}
-      }
-      type Query {
-        pizzas: [Pizza]
-      }
-    `
-    testConversion(jsonSchema, expectedSchemaText)
-  })
+    type Query {
+      people: [Person]
+    }
+  `
+  testConversion(jsonSchema, expectedSchemaText)
 })
 
 it('converts a literal object', () => {
@@ -128,26 +128,74 @@ it('fails on unknown types', () => {
   expect(conversion).toThrowError()
 })
 
+it('converts descriptions', () => {
+  expect.assertions(1)
+  const jsonSchema: JSONSchema7 = {
+    $id: 'person',
+    type: 'object',
+    description: 'An individual human being.',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'The full name of the person.',
+      },
+      age: {
+        type: 'integer',
+        description: "The elapsed time (in years) since the person's birth.",
+      },
+    },
+  }
+  const expectedSchemaText = `
+    """
+    An individual human being.
+    """
+    type Person {
+      """
+      The full name of the person.
+      """
+      name: String
+      """
+      The elapsed time (in years) since the person's birth.
+      """
+      age: Int
+    }
+    type Query {
+      people: [Person]
+    }`
+  testConversion(jsonSchema, expectedSchemaText)
+})
+
 it('converts array type properties', () => {
   expect.assertions(1)
   const jsonSchema = {
-    $id: 'Array',
+    $id: 'Person',
     type: 'object',
     properties: {
-      attribute: {
-        type: 'array', // <-- array type property
+      name: {
+        type: 'string',
+      },
+      luckyNumbers: {
+        type: 'array',
         items: {
           type: 'integer',
+        },
+      },
+      favoriteColors: {
+        type: 'array',
+        items: {
+          type: 'string',
         },
       },
     },
   }
   const expectedSchemaText = `
-    type Array {
-      attribute: [Int!]
+    type Person {
+      name: String
+      luckyNumbers: [Int!]
+      favoriteColors: [String!]
     }
     type Query {
-      arrays: [Array]
+      people: [Person]
     }`
   testConversion(jsonSchema, expectedSchemaText)
 })
@@ -595,6 +643,12 @@ test('builds custom query and mutation blocks', () => {
         name: 'Query',
         fields: {
           family: { type: types['Family'] as GraphQLOutputType },
+          user: {
+            type: types['User'] as GraphQLOutputType,
+            args: {
+              email: { type: types['Email'] as GraphQLInputType },
+            },
+          },
         },
       }),
       mutation: new GraphQLObjectType({
@@ -614,6 +668,7 @@ test('builds custom query and mutation blocks', () => {
   const expectedQueryBlock: string = `
       type Query {
         family: Family
+        user(email: String): User
       }`
   expect(actualQueryBlock).toEqualIgnoringWhitespace(expectedQueryBlock)
 
