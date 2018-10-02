@@ -30,7 +30,7 @@
     "fix:tslint": "tslint --fix --project .",
     "fix": "run-s fix:*",
     "prepare-release": "run-s all version doc:publish",
-    "reset": "git clean -dfx && git reset --hard && npm i",
+    "reset": "git clean -dfx && git reset --hard && yarn install",
     "lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
     "test": "jest",
     "version": "standard-version",
