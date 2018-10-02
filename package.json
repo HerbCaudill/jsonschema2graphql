@@ -63,7 +63,6 @@
     "@types/graphql": "^14.0.1",
     "@types/jest": "^23.3.1",
     "@types/uppercamelcase": "^3.0.0",
-    "cz-conventional-changelog": "^2.1.0",
     "gh-pages": "^2.0.0",
     "jest": "22.4.2",
     "npm-run-all": "^4.1.3",
@@ -99,11 +98,6 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "setupTestFrameworkScriptFile": "<rootDir>/test/matchers/index.ts"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
   },
   "prettier": {
     "printWidth": 120,
