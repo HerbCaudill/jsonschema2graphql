@@ -1,17 +1,21 @@
 {
   "compilerOptions": {
-    "outDir": "build/main",
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "declaration": true,
+    "esModuleInterop": true,
     "lib": ["es2017", "esnext.asynciterable"],
     "module": "commonjs",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": false,
+    "outDir": "build",
+    "rootDir": "src",
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5"
   },
-  "exclude": ["node_modules/**"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "build"]
 }

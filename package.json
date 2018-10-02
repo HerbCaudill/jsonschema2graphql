@@ -16,24 +16,20 @@
     "json-schema",
     "graphql"
   ],
-  "main": "build/main/src/index.js",
-  "typings": "src/types/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "all": "run-s reset test doc:html",
     "build": "tsc -p tsconfig.json",
     "clean": "trash build",
-    "doc:html": "typedoc src/ --target ES6 --mode file --out build/docs",
-    "doc:json": "typedoc src/ --target ES6 --mode file --json build/docs/typedoc.json",
-    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
-    "doc": "run-s doc:html && opn build/docs/index.html",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:tslint": "tslint --fix --project .",
     "fix": "run-s fix:*",
-    "prepare-release": "run-s all doc:publish",
+    "prepublish": "run-s clean build test",
+    "preview": "package-preview",
     "reset": "git clean -dfx && git reset --hard && yarn install",
     "lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
     "test": "jest",
-    "watch": "run-s clean build:main && run-p \"build:main -- -w\" \"test --watch\""
+    "watch": "run-s clean build && run-p \"build -- -w\" \"test --watch\""
   },
   "engines": {
     "node": ">=8.9"
@@ -47,6 +43,7 @@
     "jest-diff": "^23.6.0",
     "jest-matcher-utils": "^23.6.0",
     "lodash": "^4.17.11",
+    "package-preview": "^1.0.6",
     "pluralize": "^7.0.0",
     "ramda": "^0.25.0",
     "uppercamelcase": "^3.0.0"
@@ -72,7 +69,6 @@
     "ts-jest": "22.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typedoc": "^0.12.0",
     "typescript": "^3.0.3"
   },
   "jest": {
