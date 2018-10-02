@@ -1,4 +1,5 @@
 src
+test
 tsconfig.json
 tsconfig.module.json
 tslint.json
@@ -7,7 +8,7 @@ tslint.json
 .prettierignore
 .vscode
 build/docs
-**/*.spec.*
+**/*.test.*
 coverage
 .nyc_output
 *.log
