@@ -29,12 +29,6 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "@types/fs-extra": "^5.0.4",
-    "@types/jest-diff": "^20.0.0",
-    "@types/jest-matcher-utils": "^21.0.1",
-    "@types/json-schema": "^7.0.1",
-    "@types/pluralize": "^0.0.29",
-    "@types/ramda": "^0.25.38",
     "ajv": "^6.5.4",
     "babel-jest": "^23.6.0",
     "camelcase": "^5.0.0",
@@ -48,6 +42,12 @@
     "uppercamelcase": "^3.0.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
+    "@types/jest-diff": "^20.0.0",
+    "@types/jest-matcher-utils": "^21.0.1",
+    "@types/json-schema": "^7.0.1",
+    "@types/pluralize": "^0.0.29",
+    "@types/ramda": "^0.25.38",
     "@types/camelcase": "^4.1.0",
     "@types/graphql": "^14.0.1",
     "@types/jest": "^23.3.1",
