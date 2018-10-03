@@ -6,7 +6,7 @@ import {
 } from 'graphql'
 import { JSONSchema7 } from 'json-schema'
 
-import convert from '../src/convert'
+import convert from '../src'
 import { EntryPointBuilder } from '../src/types'
 import {
   approval,
