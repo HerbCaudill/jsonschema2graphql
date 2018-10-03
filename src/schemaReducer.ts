@@ -59,7 +59,7 @@ function buildType(propName: string, schema: JSONSchema7, knownTypes: GraphQLTyp
     const description = buildDescription(schema)
     const fields = () =>
       !_.isEmpty(schema.properties)
-        ? _.mapValues(schema.properties, (prop: JSONSchema7, fieldName) => {
+        ? _.mapValues(schema.properties, (prop: JSONSchema7, fieldName: string) => {
             const qualifiedFieldName = `${name}.${fieldName}`
             const type = buildType(qualifiedFieldName, prop, knownTypes) as GraphQLObjectType
             const isRequired = _.includes(schema.required, fieldName)
@@ -84,7 +84,7 @@ function buildType(propName: string, schema: JSONSchema7, knownTypes: GraphQLTyp
     if (schema.type !== 'string') throw err(`Only string enums are supported.`, name)
     const description = buildDescription(schema)
     const graphqlToJsonMap = _.keyBy(schema.enum, graphqlSafeEnumKey)
-    const values = _.mapValues(graphqlToJsonMap, value => ({ value }))
+    const values = _.mapValues(graphqlToJsonMap, (value: string) => ({ value }))
     const enumType = new GraphQLEnumType({ name, description, values })
     return enumType
   }
