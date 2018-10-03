@@ -3,6 +3,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "declaration": true,
+    "esModuleInterop": true,
     "lib": ["es2017", "esnext.asynciterable"],
     "module": "commonjs",
     "noImplicitAny": true,
