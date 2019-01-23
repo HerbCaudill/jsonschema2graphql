@@ -493,6 +493,31 @@ test('handles enum with numeric keys', () => {
   testConversion(jsonSchema, expectedSchemaText)
 })
 
+test('handles enum with namespace overlapping JS Object internals', () => {
+  const jsonSchema: JSONSchema7 = {
+    $id: 'Comparator',
+    type: 'object',
+    properties: {
+      operator: {
+        type: 'string',
+        enum: ['constructor', '__proto__']
+      },
+    },
+  }
+  const expectedSchemaText = `
+    type Comparator {
+      operator: ComparatorOperator
+    }
+    enum ComparatorOperator {
+      constructor
+      __proto__
+    }
+    type Query {
+      comparators: [Comparator]
+    }`
+  testConversion(jsonSchema, expectedSchemaText)
+})
+
 test('fails on enum for non-string properties', () => {
   const jsonSchema: JSONSchema7 = {
     $id: 'Person',
