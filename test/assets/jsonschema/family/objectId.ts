@@ -1,6 +1,6 @@
 import { pattern } from './pattern'
 export const objectId = {
-  $id: 'ObjectId',
+  $id: '#/ObjectId',
   type: 'string',
   name: 'MongoDb Object ID',
   description: '24-character hexadecimal identifier for MongoDb databases.',

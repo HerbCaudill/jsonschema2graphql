@@ -1,18 +1,17 @@
 export const user = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'User',
+  $id: '#/User',
   title: 'User',
-  description:
-    'Represents a single user (parent or child) and, in the case of a child, their full history.',
+  description: 'Represents a single user (parent or child) and, in the case of a child, their full history.',
   type: 'object',
   required: ['_id', 'email', 'name'],
   properties: {
     _id: {
-      $ref: 'ObjectId',
+      $ref: '#/ObjectId',
     },
 
     email: {
-      $ref: 'Email',
+      $ref: '#/Email',
     },
 
     name: {
@@ -35,13 +34,19 @@ export const user = {
       description: 'If true, this user has elevated privileges in this family.',
     },
 
+    balance: {
+      type: 'number',
+      description: '(Child only.) The user\'s current coin balance, calculated from the activity logs.',
+      readonly: true,
+    },
+    
     logs: {
       type: 'array',
       title: 'Users',
       description:
         '(Child only.) All of the historical activity (tasks performed, rewards earned) associated with this child.',
       items: {
-        $ref: 'Log',
+        $ref: '#/Log',
       },
     },
   },

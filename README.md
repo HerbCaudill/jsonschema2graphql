@@ -21,7 +21,7 @@ import { printSchema } from 'graphql'
 import convert from 'jsonschema2graphql'
 
 const jsonSchema = {
-  $id: 'person',
+  $id: '#/person',
   type: 'object',
   properties: {
     name: {
@@ -75,7 +75,7 @@ To generate more than one type, provide an array of JSON schemas in either objec
 
 ```js
 const orange = {
-  $id: 'Orange',
+  $id: '#/Orange',
   type: 'object',
   properties: {
     color: {
@@ -85,12 +85,12 @@ const orange = {
 }
 
 const apple = {
-  $id: 'Apple',
+  $id: '#/Apple',
   type: 'object',
   properties: {
     color: { type: 'string' },
     bestFriend: {
-      $ref: 'Orange', // <-- reference foreign type using $ref
+      $ref: '#/Orange', // <-- reference foreign type using $ref
     },
   },
 }
@@ -176,7 +176,7 @@ Input
 
 ```js
 {
-  $id: 'Person',
+  $id: '#/Person',
   type: 'object',
   properties: {
     name: { type: 'string' },
@@ -204,7 +204,7 @@ Input
 
 ```js
 const jsonSchema = {
-  $id: 'Person',
+  $id: '#/Person',
   type: 'object',
   properties: {
     name: {
@@ -242,7 +242,7 @@ Input
 
 ```js
 const jsonSchema = {
-  $id: 'Person',
+  $id: '#/Person',
   type: 'object',
   properties: {
     height: {
@@ -273,7 +273,7 @@ Input
 
 ```js
 const jsonSchema = {
-  $id: 'Widget',
+  $id: '#/Widget',
   type: 'object',
   properties: {
     somethingRequired: { type: 'integer' },
@@ -301,7 +301,7 @@ Input
 ```js
 const jsonSchema = {
   {
-    $id: 'Orange',
+    $id: '#/Orange',
     type: 'object',
     properties: {
       color: {
@@ -310,12 +310,12 @@ const jsonSchema = {
     },
   },
   {
-    $id: 'Apple',
+    $id: '#/Apple',
     type: 'object',
     properties: {
       color: { type: 'string' },
       bestFriend: {
-        $ref: 'Orange', // <-- reference foreign type using $ref
+        $ref: '#/Orange', // <-- reference foreign type using $ref
       },
     },
   },
@@ -342,7 +342,7 @@ Input
 ```js
 const jsonSchema = {
   {
-    $id: 'Parent',
+    $id: '#/Parent',
     type: 'object',
     properties: {
       type: { type: 'string' },
@@ -350,22 +350,22 @@ const jsonSchema = {
     },
   },
   {
-    $id: 'Child',
+    $id: '#/Child',
     type: 'object',
     properties: {
       type: { type: 'string' },
       name: { type: 'string' },
-      parent: { $ref: 'Parent' },
-      bestFriend: { $ref: 'Person' },
+      parent: { $ref: '#/Parent' },
+      bestFriend: { $ref: '#/Person' },
       friends: {
         type: 'array',
-        items: { $ref: 'Person' },
+        items: { $ref: '#/Person' },
       },
     },
   },
   {
-    $id: 'Person',
-    oneOf: [{ $ref: 'Parent' }, { $ref: 'Child' }],
+    $id: '#/Person',
+    oneOf: [{ $ref: '#/Parent' }, { $ref: '#/Child' }],
   },
 ]
 ```
@@ -393,15 +393,15 @@ Properties defined as `oneOf` with `if`/`then` are also supported. For example, 
 
 ```js
 const jsonSchema = {
-  $id: 'Person',
+  $id: '#/Person',
   oneOf: [
     {
       if: { properties: { type: { const: 'Parent' } } },
-      then: { $ref: 'Parent' },
+      then: { $ref: '#/Parent' },
     },
     {
       if: { properties: { type: { const: 'Child' } } },
-      then: { $ref: 'Child' },
+      then: { $ref: '#/Child' },
     },
   ],
 }
@@ -419,7 +419,7 @@ Input
 
 ```js
 const jsonSchema = {
-  $id: 'person',
+  $id: '#/person',
   type: 'object',
   description: 'An individual human being.',
   properties: {

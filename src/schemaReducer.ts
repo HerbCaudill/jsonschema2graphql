@@ -15,6 +15,7 @@ import { JSONSchema7 } from 'json-schema'
 import _ from 'lodash'
 import uppercamelcase from 'uppercamelcase'
 
+import { getTypeName } from './getTypeName'
 import { graphqlSafeEnumKey } from './graphqlSafeEnumKey'
 import { err } from './helpers'
 import { GraphQLTypeMap } from './types'
@@ -26,12 +27,14 @@ const BASIC_TYPE_MAPPING = {
   number: GraphQLFloat,
   boolean: GraphQLBoolean,
 }
+
 export function schemaReducer(knownTypes: GraphQLTypeMap, schema: JSONSchema7) {
   // validate against the json schema schema
   new Ajv().validateSchema(schema)
 
-  const typeName = schema.$id
-  if (typeof typeName === 'undefined') throw err('Schema does not have an `$id` property.')
+  const $id = schema.$id
+  if (_.isUndefined($id)) throw err('Schema does not have an `$id` property.')
+  const typeName = getTypeName($id)
 
   knownTypes[typeName] = buildType(typeName, schema, knownTypes)
   return knownTypes
@@ -89,10 +92,11 @@ function buildType(propName: string, schema: JSONSchema7, knownTypes: GraphQLTyp
     return enumType
   }
 
-  // $ref?
+  // ref?
   else if (!_.isUndefined(schema.$ref)) {
-    const type = knownTypes[schema.$ref as string]
-    if (!type) throw err(`The referenced type ${schema.$ref} is unknown.`, name)
+    const ref = getTypeName(schema.$ref)
+    const type = knownTypes[ref]
+    if (!type) throw err(`The referenced type ${ref} is unknown.`, name)
     return type
   }
 

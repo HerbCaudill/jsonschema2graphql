@@ -2,28 +2,26 @@ import { pattern } from './pattern'
 
 export const log = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'Log',
+  $id: '#/Log',
   type: 'object',
   title: 'Log',
-  description:
-    'Records an activity that takes place on a specific date, along with the coins earned or spent. ',
+  description: 'Records an activity that takes place on a specific date, along with the coins earned or spent. ',
   required: ['_id', 'item_id', 'coins', 'date'],
   properties: {
     _id: {
-      $ref: 'ObjectId',
+      $ref: '#/ObjectId',
     },
 
     item_id: {
       title: 'Item ID',
-      description: 'Reference to the Item being earned or spent in this log entry',
-      $ref: 'ObjectId',
+      // description: 'Reference to the Item being earned or spent in this log entry',
+      $ref: '#/ObjectId',
     },
 
     coins: {
       type: 'number',
       title: 'Coins',
-      description:
-        'Actual number of coins earned or spent. Might be determined automatically or entered manually.',
+      description: 'Actual number of coins earned or spent. Might be determined automatically or entered manually.',
     },
 
     date: {
@@ -43,7 +41,7 @@ export const log = {
     },
 
     timeRange: {
-      $ref: 'TimeRange',
+      $ref: '#/TimeRange',
       title: 'Time range',
       description: '(Timed items only.) The times at which the activity started and ended.',
     },
@@ -62,10 +60,9 @@ export const log = {
     },
 
     approval: {
-      $ref: 'Approval',
+      $ref: '#/Approval',
       title: 'Approval',
-      description:
-        'A record of the activity having been reviewed by a parent and either approved or rejected.',
+      description: 'A record of the activity having been reviewed by a parent and either approved or rejected.',
     },
   },
 }

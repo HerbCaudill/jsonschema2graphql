@@ -8,17 +8,15 @@ import { JSONSchema7 } from 'json-schema'
 
 import convert from '../src'
 import { EntryPointBuilder } from '../src/types'
-import {
-  approval,
-  email,
-  family,
-  item,
-  log,
-  objectId,
-  timeRange,
-  user,
-  valueRange,
-} from './assets/jsonschema/family'
+import { approval } from './assets/jsonschema/family/approval'
+import { email } from './assets/jsonschema/family/email'
+import { family } from './assets/jsonschema/family/family'
+import { item } from './assets/jsonschema/family/item'
+import { log } from './assets/jsonschema/family/log'
+import { objectId } from './assets/jsonschema/family/objectId'
+import { timeRange } from './assets/jsonschema/family/timeRange'
+import { user } from './assets/jsonschema/family/user'
+import { valueRange } from './assets/jsonschema/family/valueRange'
 import { readAsset } from './utils/assets'
 
 // Helpers
@@ -66,7 +64,7 @@ it('correctly converts basic attribute types', () => {
 it('converts a literal object', () => {
   expect.assertions(1)
   const jsonSchema: JSONSchema7 = {
-    $id: 'person',
+    $id: '#/person',
     type: 'object',
     properties: {
       name: {
@@ -116,7 +114,7 @@ it('converts a text schema', () => {
 it('fails on unknown types', () => {
   expect.assertions(1)
   const jsonSchema = JSON.stringify({
-    $id: 'Pizza',
+    $id: '#/Pizza',
     type: 'object',
     properties: {
       foo: {
@@ -131,7 +129,7 @@ it('fails on unknown types', () => {
 it('converts descriptions', () => {
   expect.assertions(1)
   const jsonSchema: JSONSchema7 = {
-    $id: 'person',
+    $id: '#/person',
     type: 'object',
     description: 'An individual human being.',
     properties: {
@@ -168,7 +166,7 @@ it('converts descriptions', () => {
 it('converts array type properties', () => {
   expect.assertions(1)
   const jsonSchema = {
-    $id: 'Person',
+    $id: '#/Person',
     type: 'object',
     properties: {
       name: {
@@ -202,7 +200,7 @@ it('converts array type properties', () => {
 
 test('enforces required attributes', () => {
   const jsonSchema = {
-    $id: 'Widget',
+    $id: '#/Widget',
     type: 'object',
     properties: {
       somethingRequired: { type: 'integer' },
@@ -225,7 +223,7 @@ test('enforces required attributes', () => {
 
 test('handles an object with no properties', () => {
   const jsonSchema = {
-    $id: 'EmptyVoid',
+    $id: '#/EmptyVoid',
     properties: {}, // <-- no properties
     type: 'object',
   }
@@ -241,7 +239,7 @@ test('handles an object with no properties', () => {
 
 test('handles a reference (using $ref)', () => {
   const orange = {
-    $id: 'Orange',
+    $id: '#/Orange',
     type: 'object',
     properties: {
       color: {
@@ -250,26 +248,26 @@ test('handles a reference (using $ref)', () => {
     },
   }
   const apple = {
-    $id: 'Apple',
+    $id: '#/Apple',
     type: 'object',
     properties: {
       color: { type: 'string' },
       bestFriend: {
-        $ref: 'Orange', // <-- reference foreign type using $ref
+        $ref: '#/Orange', // <-- reference foreign type using $ref
       },
     },
   }
   const expectedSchemaText = `
-    type Apple { 
-      color: String 
-      bestFriend: Orange 
-    } 
-    type Orange { 
-      color: String 
-    } 
-    type Query { 
+    type Apple {
+      color: String
+      bestFriend: Orange
+    }
+    type Orange {
+      color: String
+    }
+    type Query {
       oranges: [Orange]
-      apples: [Apple] 
+      apples: [Apple]
     }`
 
   testConversion([orange, apple], expectedSchemaText)
@@ -277,7 +275,7 @@ test('handles a reference (using $ref)', () => {
 
 test('handles a reference in an array property', () => {
   const orange = {
-    $id: 'Orange',
+    $id: '#/Orange',
     type: 'object',
     properties: {
       color: {
@@ -286,29 +284,29 @@ test('handles a reference in an array property', () => {
     },
   }
   const apple = {
-    $id: 'Apple',
+    $id: '#/Apple',
     type: 'object',
     properties: {
       color: { type: 'string' },
       bestFriends: {
         type: 'array', // <-- array type
         items: {
-          $ref: 'Orange', // <-- reference foreign type using $ref
+          $ref: '#/Orange', // <-- reference foreign type using $ref
         },
       },
     },
   }
   const expectedSchemaText = `
-    type Apple { 
-      color: String 
-      bestFriends: [Orange!] 
-    } 
-    type Orange { 
-      color: String 
-    } 
-    type Query { 
+    type Apple {
+      color: String
+      bestFriends: [Orange!]
+    }
+    type Orange {
+      color: String
+    }
+    type Query {
       oranges: [Orange]
-      apples: [Apple] 
+      apples: [Apple]
     }`
 
   testConversion([orange, apple], expectedSchemaText)
@@ -316,11 +314,11 @@ test('handles a reference in an array property', () => {
 
 test('fails when given an invalid $ref', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Apple',
+    $id: '#/Apple',
     type: 'object',
     properties: {
       attribute: {
-        $ref: 'Orange',
+        $ref: '#/Orange',
       },
     },
   }
@@ -330,11 +328,11 @@ test('fails when given an invalid $ref', () => {
 
 test('handles self-reference', () => {
   const employee: JSONSchema7 = {
-    $id: 'Employee',
+    $id: '#/Employee',
     type: 'object',
     properties: {
       name: { type: 'string' },
-      manager: { $ref: 'Employee' }, // <-- type refers to itself
+      manager: { $ref: '#/Employee' }, // <-- type refers to itself
     },
   }
 
@@ -343,29 +341,29 @@ test('handles self-reference', () => {
       name: String
       manager: Employee
     }
-    type Query { 
-      employees: [Employee] 
+    type Query {
+      employees: [Employee]
     }`
   testConversion(employee, expectedSchemaText)
 })
 
 test('handles a circular reference', () => {
   const apple = {
-    $id: 'Apple',
+    $id: '#/Apple',
     type: 'object',
     properties: {
       bestFriend: {
-        $ref: 'Orange',
+        $ref: '#/Orange',
       },
     },
   }
 
   const orange = {
-    $id: 'Orange',
+    $id: '#/Orange',
     type: 'object',
     properties: {
       bestFriend: {
-        $ref: 'Apple',
+        $ref: '#/Apple',
       },
     },
   }
@@ -377,16 +375,16 @@ test('handles a circular reference', () => {
     type Orange {
       bestFriend: Apple
     }
-    type Query { 
-      oranges: [Orange] 
-      apples: [Apple] 
+    type Query {
+      oranges: [Orange]
+      apples: [Apple]
     }`
   testConversion([orange, apple], expectedSchemaText)
 })
 
 test('handles enum types', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Person',
+    $id: '#/Person',
     type: 'object',
     properties: {
       height: {
@@ -405,8 +403,8 @@ test('handles enum types', () => {
       average
       short
     }
-    type Query { 
-      people: [Person] 
+    type Query {
+      people: [Person]
     }`
 
   testConversion(jsonSchema, expectedSchemaText)
@@ -414,7 +412,7 @@ test('handles enum types', () => {
 
 test('handles enum types with invalid characters', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Person',
+    $id: '#/Person',
     type: 'object',
     properties: {
       height: {
@@ -433,8 +431,8 @@ test('handles enum types with invalid characters', () => {
       average
       really_really_short
     }
-    type Query { 
-      people: [Person] 
+    type Query {
+      people: [Person]
     }`
 
   testConversion(jsonSchema, expectedSchemaText)
@@ -442,7 +440,7 @@ test('handles enum types with invalid characters', () => {
 
 test('handles enum with comparison symbols', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Comparator',
+    $id: '#/Comparator',
     type: 'object',
     properties: {
       operator: {
@@ -469,7 +467,7 @@ test('handles enum with comparison symbols', () => {
 
 test('handles enum with numeric keys', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Person',
+    $id: '#/Person',
     type: 'object',
     properties: {
       age: {
@@ -495,7 +493,7 @@ test('handles enum with numeric keys', () => {
 
 test('fails on enum for non-string properties', () => {
   const jsonSchema: JSONSchema7 = {
-    $id: 'Person',
+    $id: '#/Person',
     type: 'object',
     properties: {
       age: {
@@ -510,7 +508,7 @@ test('fails on enum for non-string properties', () => {
 
 test('converts `oneOf` schemas (with if/then) to union types', () => {
   const parent: JSONSchema7 = {
-    $id: 'Parent',
+    $id: '#/Parent',
     type: 'object',
     properties: {
       type: { type: 'string' },
@@ -518,29 +516,29 @@ test('converts `oneOf` schemas (with if/then) to union types', () => {
     },
   }
   const child: JSONSchema7 = {
-    $id: 'Child',
+    $id: '#/Child',
     type: 'object',
     properties: {
       type: { type: 'string' },
       name: { type: 'string' },
-      parent: { $ref: 'Parent' },
-      bestFriend: { $ref: 'Person' },
+      parent: { $ref: '#/Parent' },
+      bestFriend: { $ref: '#/Person' },
       friends: {
         type: 'array',
-        items: { $ref: 'Person' },
+        items: { $ref: '#/Person' },
       },
     },
   }
   const person: JSONSchema7 = {
-    $id: 'Person',
+    $id: '#/Person',
     oneOf: [
       {
         if: { properties: { type: { const: 'Parent' } } },
-        then: { $ref: 'Parent' },
+        then: { $ref: '#/Parent' },
       },
       {
         if: { properties: { type: { const: 'Child' } } },
-        then: { $ref: 'Child' },
+        then: { $ref: '#/Child' },
       },
     ],
   }
@@ -557,17 +555,17 @@ test('converts `oneOf` schemas (with if/then) to union types', () => {
       name: String
     }
     union Person = Parent | Child
-    type Query { 
-      parents: [Parent] 
-      children: [Child] 
-      people: [Person] 
+    type Query {
+      parents: [Parent]
+      children: [Child]
+      people: [Person]
     }`
   testConversion([parent, child, person], expectedSchemaText)
 })
 
 test('converts `oneOf` schemas to union types', () => {
   const parent: JSONSchema7 = {
-    $id: 'Parent',
+    $id: '#/Parent',
     type: 'object',
     properties: {
       type: { type: 'string' },
@@ -575,22 +573,22 @@ test('converts `oneOf` schemas to union types', () => {
     },
   }
   const child: JSONSchema7 = {
-    $id: 'Child',
+    $id: '#/Child',
     type: 'object',
     properties: {
       type: { type: 'string' },
       name: { type: 'string' },
-      parent: { $ref: 'Parent' },
-      bestFriend: { $ref: 'Person' },
+      parent: { $ref: '#/Parent' },
+      bestFriend: { $ref: '#/Person' },
       friends: {
         type: 'array',
-        items: { $ref: 'Person' },
+        items: { $ref: '#/Person' },
       },
     },
   }
   const person: JSONSchema7 = {
-    $id: 'Person',
-    oneOf: [{ $ref: 'Parent' }, { $ref: 'Child' }],
+    $id: '#/Person',
+    oneOf: [{ $ref: '#/Parent' }, { $ref: '#/Child' }],
   }
   const expectedSchemaText = `
     type Child {
@@ -605,10 +603,10 @@ test('converts `oneOf` schemas to union types', () => {
       name: String
     }
     union Person = Parent | Child
-    type Query { 
-      parents: [Parent] 
-      children: [Child] 
-      people: [Person] 
+    type Query {
+      parents: [Parent]
+      children: [Child]
+      people: [Person]
     }`
   testConversion([parent, child, person], expectedSchemaText)
 })
@@ -629,7 +627,7 @@ const FAMILY = [
 ]
 
 test('converts family schema', () => {
-  const jsonSchema = FAMILY as JSONSchema7
+  const jsonSchema = FAMILY as JSONSchema7[]
   const expectedSchemaText: string = readAsset('graphql/family.graphql')
   testConversion(jsonSchema, expectedSchemaText)
 })

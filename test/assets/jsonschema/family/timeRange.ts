@@ -2,7 +2,7 @@ import { pattern } from './pattern'
 
 export const timeRange = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'TimeRange',
+  $id: '#/TimeRange',
   type: 'object',
   title: 'Time range',
   description: 'Start and end times for an activity.',

@@ -1,6 +1,6 @@
 export const valueRange = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  $id: 'ValueRange',
+  $id: '#/ValueRange',
   type: 'object',
   title: 'Value Range',
   properties: {
