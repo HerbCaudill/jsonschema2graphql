@@ -493,7 +493,7 @@ test('handles enum with namespace overlapping JS Object internals', () => {
     properties: {
       operator: {
         type: 'string',
-        enum: ['constructor', '__proto__']
+        enum: ['constructor', '__proto__'],
       },
     },
   }
