@@ -631,6 +631,36 @@ test('converts `oneOf` schemas to union types', () => {
   testConversion([parent, child, person], expectedSchemaText)
 })
 
+test('handles `oneOf` schemas that include anonymous types', () => {
+  const thing: JSONSchema7 = {
+    $id: '#/Thing',
+    oneOf: [
+      {
+        type: 'string',
+      },
+      {
+        type: 'object',
+        properties: {
+          foo: {
+            type: 'string',
+          },
+        },
+      },
+    ],
+  }
+
+  const expectedSchemaText = `
+    type Query {
+      things: [Thing]
+    }
+    union Thing = String | Thing1
+    type Thing1 {
+      foo: String
+    }
+  `
+  testConversion(thing, expectedSchemaText)
+})
+
 //
 // Family tests
 
