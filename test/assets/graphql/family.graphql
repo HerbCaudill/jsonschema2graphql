@@ -2,13 +2,13 @@
 Approval: If this field element and the `approved` value is `true`, the log entry was reviewed and approved by a parent.
 """
 type Approval {
-  "User ID: Reference to the User making the approval"
+  "Reference to the User making the approval"
   user_id: String!
 
-  "Timestamp: Date and time that the approval was made"
+  "Date and time that the approval was made"
   timeStamp: String!
 
-  "Approved: If an existing approval entry has a value of `approved=false`, then the log item was rejected."
+  "If an existing approval entry has a value of `approved=false`, then the log item was rejected."
   approved: Boolean!
 }
 
@@ -18,13 +18,13 @@ Family: Represents a single family account and all its data.
 type Family {
   _id: String!
 
-  "Name: Name of the family. Typically one or two last names."
+  "Name of the family. Typically one or two last names."
   name: String!
 
-  "Users: All users (parents and children) associated with the family."
+  "All users (parents and children) associated with the family."
   users: [User!]!
 
-  "Items: The tasks and rewards defined by this family."
+  "The tasks and rewards defined by this family."
   items: [Item!]!
 }
 
@@ -35,25 +35,24 @@ reward (something that spends coins, e.g. screen time).
 type Item {
   _id: String!
 
-  "Name: Name of the task (for earning coins) or reward (for spending coins)."
+  "Name of the task (for earning coins) or reward (for spending coins)."
   name: String!
 
-  "Icon"
   icon: String!
 
-  "Description: Description of the task or reward."
+  "Description of the task or reward."
   description: String!
 
   """
-  Timed?: If true, the number of coins generated or consumed by this item
-  depends of the number of minutes that it lasted. For example, screen time or reading time.
+  If true, the number of coins generated or consumed by this item depends of the 
+  number of minutes that it lasted. For example, screen time or reading time.
   """
   isTimed: Boolean
 
-  "Coin value: Value in coins of the given task or activity. If the activity is timed, this is the value of 10 minutes."
+  "Value in coins of the given task or activity. If the activity is timed, this is the value of 10 minutes."
   coinValue: Int!
 
-  "Range of coin values: Minimum and maximum coin values that can be earned or spent for this item."
+  "Minimum and maximum coin values that can be earned or spent for this item."
   coinValueRange: ValueRange
 }
 
@@ -63,7 +62,7 @@ Log: Records an activity that takes place on a specific date, along with the coi
 type Log {
   _id: String!
 
-  "Item ID: Reference to the Item being earned or spent in this log entry"
+  "Item ID"
   item_id: String!
 
   "Coins: Actual number of coins earned or spent. Might be determined automatically or entered manually."
@@ -130,6 +129,9 @@ type User {
 
   "Parent?: If true, this user has elevated privileges in this family."
   isParent: Boolean
+
+  "(Child only.) The user's current coin balance, calculated from the activity logs."
+  balance: Float
 
   "Users: (Child only.) All of the historical activity (tasks performed, rewards earned) associated with this child."
   logs: [Log!]
