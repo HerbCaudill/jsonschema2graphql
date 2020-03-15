@@ -16,5 +16,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+
+  // need this since we're extending jest ¯\_(ツ)_/¯
+  // https://github.com/testing-library/react-testing-library/issues/36#issuecomment-451246759
+  "exclude": ["jest"]
 }
