@@ -1,4 +1,4 @@
-declare namespace jest {
+declare module jest {
   interface Matchers<R> {
     toEqualIgnoringWhitespace: (s: string) => void
   }
