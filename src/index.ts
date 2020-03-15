@@ -3,7 +3,7 @@ import { JSONSchema7 } from 'json-schema'
 
 import { DEFAULT_ENTRY_POINTS } from './helpers'
 import { schemaReducer } from './schemaReducer'
-import { ConvertParams, GraphQLTypeMap } from './types'
+import { ConvertParams, GraphQLTypeMap } from './@types'
 
 /**
  * @param jsonSchema - An individual schema or an array of schemas, provided

@@ -1,13 +1,8 @@
-import {
-  GraphQLInputType,
-  GraphQLObjectType,
-  GraphQLOutputType,
-  printSchema,
-} from 'graphql'
+import { GraphQLInputType, GraphQLObjectType, GraphQLOutputType, printSchema } from 'graphql'
 import { JSONSchema7 } from 'json-schema'
 
 import convert from '../src'
-import { EntryPointBuilder } from '../src/types'
+import { EntryPointBuilder } from '../src/@types'
 import { approval } from './assets/jsonschema/family/approval'
 import { email } from './assets/jsonschema/family/email'
 import { family } from './assets/jsonschema/family/family'

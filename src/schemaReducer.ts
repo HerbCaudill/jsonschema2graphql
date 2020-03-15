@@ -18,7 +18,7 @@ import uppercamelcase from 'uppercamelcase'
 import { getTypeName } from './getTypeName'
 import { graphqlSafeEnumKey } from './graphqlSafeEnumKey'
 import { err } from './helpers'
-import { GraphQLTypeMap } from './types'
+import { GraphQLTypeMap } from './@types'
 
 /** Maps basic JSON schema types to basic GraphQL types */
 const BASIC_TYPE_MAPPING = {

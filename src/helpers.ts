@@ -2,7 +2,7 @@ import camelcase from 'camelcase'
 import { GraphQLList, GraphQLObjectType, GraphQLType } from 'graphql'
 import pluralize from 'pluralize'
 
-import { EntryPointBuilder } from './types'
+import { EntryPointBuilder } from './@types'
 
 /** This generates the default `Query` block of the schema. */
 export const DEFAULT_ENTRY_POINTS: EntryPointBuilder = types => ({
