@@ -14,11 +14,10 @@ import {
 import { JSONSchema7 } from 'json-schema'
 import _ from 'lodash'
 import uppercamelcase from 'uppercamelcase'
-
+import { GraphQLTypeMap } from './@types'
 import { getTypeName } from './getTypeName'
 import { graphqlSafeEnumKey } from './graphqlSafeEnumKey'
 import { err } from './helpers'
-import { GraphQLTypeMap } from './@types'
 
 /** Maps basic JSON schema types to basic GraphQL types */
 const BASIC_TYPE_MAPPING = {
@@ -35,6 +34,13 @@ export function schemaReducer(knownTypes: GraphQLTypeMap, schema: JSONSchema7) {
   const $id = schema.$id
   if (_.isUndefined($id)) throw err('Schema does not have an `$id` property.')
   const typeName = getTypeName($id)
+
+  // definitions
+  const { definitions } = schema
+  for (const definedTypeName in definitions) {
+    const definedSchema = definitions[definedTypeName] as JSONSchema7
+    knownTypes[definedTypeName] = buildType(definedTypeName, definedSchema, knownTypes)
+  }
 
   knownTypes[typeName] = buildType(typeName, schema, knownTypes)
   return knownTypes

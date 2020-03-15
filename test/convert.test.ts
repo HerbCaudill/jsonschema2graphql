@@ -377,6 +377,44 @@ test('handles a circular reference', () => {
   testConversion([orange, apple], expectedSchemaText)
 })
 
+test('handles references to local definitions', () => {
+  const jsonSchema: JSONSchema7 = {
+    $id: '#/Contact',
+    definitions: {
+      Address: {
+        type: 'object',
+        properties: {
+          street_address: { type: 'string' },
+          city: { type: 'string' },
+          state: { type: 'string' },
+        },
+      },
+    },
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      billing_address: { $ref: '#/definitions/Address' },
+      shipping_address: { $ref: '#/definitions/Address' },
+    },
+  }
+  const expectedSchemaText = `
+    type Address {
+      street_address: String
+      city: String
+      state: String
+    }
+    type Contact {
+      name: String
+      billing_address: Address
+      shipping_address: Address
+    }
+    type Query {
+      addresses: [Address]
+      contacts: [Contact]
+    }`
+  testConversion(jsonSchema, expectedSchemaText)
+})
+
 test('handles enum types', () => {
   const jsonSchema: JSONSchema7 = {
     $id: '#/Person',
