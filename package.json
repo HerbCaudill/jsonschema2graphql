@@ -21,13 +21,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "trash build",
-    "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "fix:tslint": "tslint --fix --project .",
-    "fix": "run-s fix:*",
     "prepublishOnly": "run-s clean build test",
     "preview": "package-preview ",
     "reset": "git clean -dfx && git reset --hard && yarn install",
-    "lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
     "test": "jest",
     "watch": "run-s clean build && run-p \"build -- -w\" \"test --watch\""
   },
@@ -68,8 +64,6 @@
     "tmp-promise": "^1.0.5",
     "trash-cli": "^1.4.0",
     "ts-jest": "22.0.1",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.0.3"
   },
   "jest": {
