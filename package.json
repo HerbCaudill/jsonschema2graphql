@@ -33,7 +33,7 @@
   "dependencies": {
     "ajv": "^6.5.4",
     "camelcase": "^5.0.0",
-    "graphql": "14.0.2",
+    "graphql": "^14.0.2",
     "lodash": "^4.17.11",
     "pluralize": "^7.0.0",
     "ramda": "^0.25.0",
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@types/camelcase": "^4.1.0",
     "@types/fs-extra": "^5.0.4",
-    "@types/graphql": "^14.0.1",
     "@types/jest": "^23.3.1",
     "@types/jest-diff": "^20.0.0",
     "@types/jest-matcher-utils": "^21.0.1",
