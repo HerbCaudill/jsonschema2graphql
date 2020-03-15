@@ -49,7 +49,7 @@ function buildType(propName: string, schema: JSONSchema7, knownTypes: GraphQLTyp
     const caseKeys = Object.keys(cases)
     const types: GraphQLObjectType[] = caseKeys.map((caseName: string) => {
       const caseSchema = cases[caseName]
-      const qualifiedName = `${name}.oneOf[${caseName}]`
+      const qualifiedName = `${name}_${caseName}`
       const typeSchema = (caseSchema.then || caseSchema) as JSONSchema7
       return buildType(qualifiedName, typeSchema, knownTypes) as GraphQLObjectType
     })
